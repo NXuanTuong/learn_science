@@ -66,7 +66,7 @@ const SignInScreen = () => {
       <div className="relative flex h-screen bg-cover bg-center bg-no-repeat flex-col justify-center lg:px-8 bg-[url('/public/images/background_signin.png')]">
         <div className="flex flex-row justify-evenly items-center align-center">
           <img
-            src="/public/images/DS cho Tường-03.png"
+            src="/images/logo.png"
             className="w-40 h-40 absolute bottom-0 right-10"
             alt=""
           />
@@ -170,7 +170,7 @@ const SignInScreen = () => {
 
           <img
             className="w-[550px] h-[550px] "
-            src="/public/images/rabbit_two.png"
+            src="/images/rabbit_two.png"
             alt=""
           />
         </div>

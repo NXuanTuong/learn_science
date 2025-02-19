@@ -58,14 +58,14 @@ const RegistrationScreen = () => {
       <div className="relative flex h-screen bg-cover bg-center bg-no-repeat bg-[url('/public/images/background_register.png')] ">
         <div className="flex w-full flex-row justify-evenly items-center overflow-auto pt-20">
           <img
-            src="/public/images/logo.png"
+            src="/images/logo.png"
             className="w-40 h-40 absolute bottom-0 left-10"
             alt=""
           />
 
           <img
             className="w-[550px] h-[550px] "
-            src="/public/images/rabbit_four.png"
+            src="/images/rabbit_four.png"
             alt=""
           />
 
