@@ -170,7 +170,7 @@ const SignInScreen = () => {
 
           <img
             className="w-[550px] h-[550px] "
-            src="/public/images/tuong2.png"
+            src="/public/images/rabbit_two.png"
             alt=""
           />
         </div>
