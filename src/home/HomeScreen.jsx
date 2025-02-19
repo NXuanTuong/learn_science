@@ -5,8 +5,8 @@ import NavBar from "./components/NavBar";
 const HomeScreen = () => {
   return (
     <>
-      <div className="w-full h-screen flex justify-center items-center bg-gray-100">
-        <div className="w-full h-full bg-[#b2c4a9]">
+      <div className="bg-[#b2c4a9]">
+        <div className="w-full h-screen bg-[#b2c4a9]">
           <div className="w-full bg-[#b2c4a9] flex justify-center items-center flex-col overflow-auto py-12">
             <NavBar />
             <MainScreen />
