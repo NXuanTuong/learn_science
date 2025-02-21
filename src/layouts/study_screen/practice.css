@@ -1,0 +1,42 @@
+progress {
+  appearance: none; /* Xóa style mặc định */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 7.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  overflow: hidden; /* Đảm bảo phần bar bo tròn */
+  background-color: #e5e7eb; /* Màu nền (màu xám nhạt) */
+  
+}
+
+/* Định dạng thanh progress bên trong */
+progress::-webkit-progress-bar {
+  background-color: #e5e7eb; /* Màu nền */
+  border-radius: 9999px;
+}
+
+progress::-webkit-progress-value {
+  background-color: #004a37; /* Màu xanh dương */
+  border-radius: 9999px;
+  transition: width 0.3s ease-in-out; /* Hiệu ứng mượt khi giá trị thay đổi */
+}
+
+/* Firefox */
+progress::-moz-progress-bar {
+  background-color: #004a37; /* Màu xanh dương */
+  border-radius: 9999px;
+}
+
+@keyframes progress-animation {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 20%;
+  }
+}
+
+progress::-webkit-progress-value {
+  animation: progress-animation 1s ease-in-out;
+}

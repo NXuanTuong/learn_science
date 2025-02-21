@@ -1,16 +1,15 @@
 import React from "react";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
-import { signin } from "../../config/auth";
-import Cookies from "universal-cookie";
-import { useEffect } from "react";
+import { register } from "../../../config/auth";
 
-const SignInScreen = () => {
-  const cookies = new Cookies();
-  const navigate = useNavigate();
+const RegistrationScreen = () => {
   const [values, setValues] = useState({
+    fullname: "",
     username: "",
+    phonenumber: "",
+    email: "",
     password: "",
   });
 
@@ -28,21 +27,15 @@ const SignInScreen = () => {
     e.preventDefault();
 
     try {
-      const response = await signin({
+      const response = await register({
+        fullName: values.fullname,
         userName: values.username,
+        phone: values.phonenumber,
+        email: values.email,
         password: values.password,
       });
 
       if (response) {
-        const expires = 7 * 24 * 3600;
-        if (cookies.get("signin_user")) {
-          cookies.remove("signin_user");
-        }
-        cookies.set("signin_user", response.data.result.access_token, {
-          maxAge: expires,
-          path: "/",
-          // httpOnly: true,
-        });
         return toast.success("Đăng nhập thành công");
       }
     } catch (error) {
@@ -51,33 +44,29 @@ const SignInScreen = () => {
       );
     }
 
-    setValues({ username: "", password: "" }); // Only clear values on success
+    setValues({
+      fullname: "",
+      username: "",
+      phonenumber: "",
+      email: "",
+      password: "",
+    }); // Only clear values on success
   };
-
-  useEffect(() => {
-    localStorage.clear();
-    if (cookies.get("signin_user")) {
-      navigate("/");
-    }
-  }, [navigate]);
 
   return (
     <>
-      <div className="relative flex h-screen bg-cover bg-center bg-no-repeat flex-col justify-center lg:px-8 bg-[url('/public/images/background_signin.png')]">
-        <div className="flex flex-row justify-evenly items-center align-center">
+      <div className="relative flex min-h-screen bg-cover bg-center bg-no-repeat bg-[url('/public/images/background_register.png')] ">
+        <div className="flex w-full flex-row justify-evenly items-center overflow-auto pt-10 pb-10">
           <img
-            src="/images/logo.png"
-            className="w-40 h-40 absolute bottom-0 right-10"
+            className="w-[550px] h-[550px] "
+            src="/images/rabbit_four.png"
             alt=""
           />
 
           <div className="w-2/5 rounded-2xl bg-[#fff] flex flex-col border-2 border-[#004a37] justify-center items-center py-5 shadow-[0.75rem_-0.6875rem_1rem_rgba(0,74,55,0.5)]">
             <div className="sm:mx-auto sm:w-full sm:max-w-sm flex flex-col items-center">
-              {/* <p className="text-6xl text-[#004a37] font-['Exo_2'] font-bold">
-                Sci-Learing
-              </p> */}
               <h2 className="mt-5 text-center text-4xl/9 font-bold tracking-tight text-gray-900">
-                Đăng Nhập
+                Đăng Ký
               </h2>
             </div>
 
@@ -90,15 +79,68 @@ const SignInScreen = () => {
               >
                 <div>
                   <label className="block text-sm/6 font-medium text-gray-900">
+                    Họ và Tên
+                  </label>
+                  <div className="mt-2">
+                    <input
+                      onChange={(e) => handleChangeForm(e)}
+                      value={values.fullname}
+                      type="text"
+                      name="fullname"
+                      id="fullname"
+                      required
+                      className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm/6 font-medium text-gray-900">
                     Tên đăng nhập
                   </label>
                   <div className="mt-2">
                     <input
                       onChange={(e) => handleChangeForm(e)}
+                      value={values.username}
                       type="text"
                       name="username"
-                      value={values.username}
                       id="username"
+                      required
+                      className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between">
+                    <label className="block text-sm/6 font-medium text-gray-900">
+                      Số điện thoại
+                    </label>
+                  </div>
+                  <div className="mt-2">
+                    <input
+                      onChange={(e) => handleChangeForm(e)}
+                      type="text"
+                      value={values.phonenumber}
+                      name="phonenumber"
+                      id="phonenumber"
+                      required
+                      className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm/6 font-medium text-gray-900">
+                    Email
+                  </label>
+                  <div className="mt-2">
+                    <input
+                      onChange={(e) => handleChangeForm(e)}
+                      type="email"
+                      value={values.email}
+                      name="email"
+                      id="email"
                       required
                       className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                     />
@@ -141,9 +183,9 @@ const SignInScreen = () => {
                 <div>
                   <button
                     type="submit"
-                    className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    className="flex cursor-pointer w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                   >
-                    Đăng nhập
+                    Đăng ký
                   </button>
                 </div>
               </form>
@@ -151,32 +193,26 @@ const SignInScreen = () => {
               <div className="flex flex-col justify-center items-center mt-2">
                 <div className="flex flex-row justify-center items-center mt-5">
                   <p className="text-center text-sm/6 text-gray-500">
-                    Chưa có tài khoản ?
+                    Đã có tài khoản ?
                   </p>
-                  <Link to={"/dang_ky"}>
-                    <p className="font-semibold text-indigo-600 hover:text-indigo-500 ml-2">
-                      Đăng ký
+                  <Link to={"/dang_nhap"}>
+                    <p className="cursor-pointer font-semibold text-indigo-600 hover:text-indigo-500 ml-2">
+                      Đăng nhập
                     </p>
-                  </Link>{" "}
+                  </Link>
                 </div>
                 <Link to={"/"}>
-                  <p className="font-semibold text-indigo-600 hover:text-indigo-500 ml-3">
+                  <p className="cursor-pointer font-semibold text-indigo-600 hover:text-indigo-500 ml-2">
                     Về trang chủ
                   </p>
-                </Link>{" "}
+                </Link>
               </div>
             </div>
           </div>
-
-          <img
-            className="w-[550px] h-[550px] "
-            src="/images/rabbit_two.png"
-            alt=""
-          />
         </div>
       </div>
     </>
   );
 };
 
-export default SignInScreen;
+export default RegistrationScreen;
