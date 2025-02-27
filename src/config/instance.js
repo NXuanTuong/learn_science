@@ -5,7 +5,7 @@ const instance = axios.create({
   headers: {
     //  Authorization: `<Your Auth Token>`,
     "Content-Type": "application/json",
-    timeout: 2000,
+    timeout: 6000,
   },
 });
 
