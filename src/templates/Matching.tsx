@@ -1,16 +1,20 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { setUserAnswer } from "../store/listQuestionSlice";
+import { QuestionTemplateProps } from "../interface/question";
+import React from "react";
 
-const MultipleResponseQuestion = ({
+const Matching = ({
   question,
   selectedQuestion,
   handleQuestionChange,
   questions,
   questionItem,
-}) => {
+}: QuestionTemplateProps) => {
   const questionChoices = question.choices;
+  const questionTargets = question.targets;
   const dispatch = useDispatch();
+  const initialSelectedIndices = questionTargets.map((_, index) => [-1, -1]);
 
   const getGridCols = () => {
     if (questionChoices.length === 5) return "grid-cols-3"; // 3 trên, 2 dưới
@@ -24,14 +28,47 @@ const MultipleResponseQuestion = ({
     if (storedAnswers) {
       try {
         const parsedAnswers = JSON.parse(storedAnswers);
-        return parsedAnswers[selectedQuestion]?.answer || [];
+        return (
+          parsedAnswers[selectedQuestion]?.answer || initialSelectedIndices
+        );
       } catch (error) {
         console.error("Error parsing localStorage data:", error);
       }
     }
 
-    return []; // Trả về mảng rỗng nếu không có dữ liệu hợp lệ
+    return initialSelectedIndices; // Trả về mảng rỗng nếu không có dữ liệu hợp lệ
   });
+
+  // mỗi item trong mảng select có dạng [leftIndex, rightIndex]
+  // target => left, choice => right
+
+  const handleSelectLeft = (index) => {
+    let leftIndex = selectedIndices[index][0];
+    let rightIndex = selectedIndices[index][1];
+    if (leftIndex === index) {
+      setSelectedIndices((prevIndices) => {
+        return prevIndices.map((item, i) => (i === index ? [-1, -1] : item));
+      });
+    } else {
+      setSelectedIndices((prevIndices) => {
+        return prevIndices.map((item, i) => (i === index ? [index, rightIndex] : item));
+      });
+    }
+    // handleSelect(index);
+  };
+  const handleSelectRight = (index) => {
+    let rightIndex = selectedIndices[index][1];
+    let leftIndex = selectedIndices[index][0];
+    if (rightIndex === index) {
+      setSelectedIndices((prevIndices) => {
+        return prevIndices.map((item, i) => (i === index ? [-1, -1] : item));
+      });
+    } else {
+      setSelectedIndices((prevIndices) => {
+        return prevIndices.map((item, i) => (i === index ? [leftIndex, index] : item));
+      });
+    }
+  };
 
   const handleSelect = (index) => {
     setSelectedIndices((prevIndices) => {
@@ -56,28 +93,30 @@ const MultipleResponseQuestion = ({
     });
   };
 
-  const showSolutions = JSON.parse(localStorage.getItem("showSolutions"));
+  const showSolutions = JSON.parse(
+    localStorage.getItem("showSolutions") as string
+  );
 
   // Kiểm tra nếu tất cả các lựa chọn đều đúng
   const isAllCorrect =
     selectedIndices.length > 0 &&
     selectedIndices.every((index) => question.solutions[index]);
-
   return (
     <>
       <div className="flex flex-col gap-8 justify-center items-center">
-        <div className={`grid ${getGridCols()} gap-8`}>
-          {questionChoices.map((choice, index) => {
-            const isSelected = selectedIndices?.includes(index);
-
-            return (
-              <button
-                key={index}
-                onClick={() => handleSelect(index)}
-                disabled={JSON.parse(showSolutions)}
-                className={`w-[9rem] h-[3.5rem] cursor-pointer p-3 text-lg font-bold rounded-full transition-all duration-300 ease-in-out
+        <div className="grid grid-cols-2 gap-4">
+          <div className={`grid grid-row-1 gap-8`}>
+            {questionTargets.map((choice, index) => {
+              let left = selectedIndices[index][0];
+              const isSelected = left === index;
+              return (
+                <button
+                  key={index}
+                  onClick={() => handleSelectLeft(index)}
+                  disabled={JSON.parse(showSolutions)}
+                  className={`w-[9rem] h-[3.5rem] cursor-pointer p-3 text-lg font-bold rounded-full transition-all duration-300 ease-in-out
               ${
-                selectedIndices.includes(index) // Kiểm tra nếu index nằm trong danh sách lựa chọn
+                isSelected // Kiểm tra nếu index nằm trong danh sách lựa chọn
                   ? JSON.parse(showSolutions)
                     ? question.solutions[index] // Kiểm tra đúng/sai từ solutions
                       ? "bg-green-500 text-white shadow-[0px_4px_0px_#1B5E20] scale-105 border border-white" // Đúng -> Xanh
@@ -87,11 +126,40 @@ const MultipleResponseQuestion = ({
               }
               hover:from-green-400 hover:to-green-600 hover:shadow-[1px_1px_0px_#1B5E20]
               active:shadow-none active:translate-y-[2px] active:translate-x-[2px]`}
-              >
-                {choice}
-              </button>
-            );
-          })}
+                >
+                  {choice}
+                </button>
+              );
+            })}
+          </div>
+          <div className={`grid grid-row-1 gap-8`}>
+            {questionChoices.map((choice, index) => {
+              let right = selectedIndices[index][1];
+              const isSelected = right === index;
+
+              return (
+                <button
+                  key={index}
+                  onClick={() => handleSelectRight(index)}
+                  disabled={JSON.parse(showSolutions)}
+                  className={`w-[9rem] h-[3.5rem] cursor-pointer p-3 text-lg font-bold rounded-full transition-all duration-300 ease-in-out
+              ${
+                isSelected // Kiểm tra nếu index nằm trong danh sách lựa chọn
+                  ? JSON.parse(showSolutions)
+                    ? question.solutions[index] // Kiểm tra đúng/sai từ solutions
+                      ? "bg-green-500 text-white shadow-[0px_4px_0px_#1B5E20] scale-105 border border-white" // Đúng -> Xanh
+                      : "bg-red-500 text-white shadow-[0px_4px_0px_#8B0000] scale-105 border border-white" // Sai -> Đỏ
+                    : "bg-green-700 text-white shadow-[0px_4px_0px_#1B5E20] scale-105 border border-white" // Khi chọn trước khi xem đáp án
+                  : "bg-white text-green-900 shadow-[2px_2px_0px_#1B5E20] border border-green"
+              }
+              hover:from-green-400 hover:to-green-600 hover:shadow-[1px_1px_0px_#1B5E20]
+              active:shadow-none active:translate-y-[2px] active:translate-x-[2px]`}
+                >
+                  {choice}
+                </button>
+              );
+            })}
+          </div>
         </div>
         {showSolutions && (
           <div className="flex flex-col gap-4 justify-center items-center">
@@ -180,4 +248,4 @@ const MultipleResponseQuestion = ({
   );
 };
 
-export default MultipleResponseQuestion;
+export default Matching;

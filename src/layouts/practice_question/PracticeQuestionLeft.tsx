@@ -2,6 +2,8 @@ import React from "react";
 import QPrompt1_1 from "../../templates/contents/QPrompt1_1";
 import MultipleChoiceQuestion from "../../templates/MutilpleChoice";
 import MultipleResponseQuestion from "../../templates/MutilpleResponse";
+import Matching from "../../templates/Matching";
+import FlyDrag from "../../templates/FlyDrag";
 
 const PracticeQuestionLeft = ({
   question,
@@ -42,6 +44,26 @@ const PracticeQuestionLeft = ({
       case "MultipleResponse":
         return (
           <MultipleResponseQuestion
+            questionItem={question}
+            question={question.question}
+            selectedQuestion={selectedQuestion}
+            handleQuestionChange={handleQuestionChange}
+            questions={questions}
+          />
+        );
+      case "FlyDrag":
+        return (
+          <FlyDrag
+            questionItem={question}
+            question={question.question}
+            selectedQuestion={selectedQuestion}
+            handleQuestionChange={handleQuestionChange}
+            questions={questions}
+          />
+        );
+      case "Matching":
+        return (
+          <Matching
             questionItem={question}
             question={question.question}
             selectedQuestion={selectedQuestion}
