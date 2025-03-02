@@ -43,29 +43,94 @@ const Matching = ({
   // target => left, choice => right
 
   const handleSelectLeft = (index) => {
-    let leftIndex = selectedIndices[index][0];
-    let rightIndex = selectedIndices[index][1];
-    if (leftIndex === index) {
+    let existSelect = selectedIndices.findIndex((item) => item[0] === index);
+    let currentSelect = selectedIndices.findIndex(
+      (item) => item[0] == -1 && item[1] !== -1
+    );
+
+    if (existSelect !== -1) {
+      let rightIndex = selectedIndices[existSelect][1];
+      let lastCurrentSelect = selectedIndices.findLastIndex(
+        (item) => item[0] !== -1 && item[1] === -1
+      );
+      let lastCurrentSelectRight = lastCurrentSelect === -1 ? -1 : selectedIndices[lastCurrentSelect][1];
       setSelectedIndices((prevIndices) => {
-        return prevIndices.map((item, i) => (i === index ? [-1, -1] : item));
+        return prevIndices.map((item, i) =>
+          i === existSelect
+            ? [-1, -1]
+            : i === lastCurrentSelect
+            ? [index, lastCurrentSelectRight]
+            : item
+        );
       });
     } else {
+      let lastPairComplete = selectedIndices.findLastIndex(
+        (item) => item[0] !== -1 && item[1] !== -1
+      );
+      currentSelect = selectedIndices.findIndex(
+        (item) => item[0] !== -1 && item[1] === -1
+      );
+
+      let firstLeftEmptyIndex = selectedIndices.findIndex(
+        (item) => item[0] === -1
+      );
+      let saveIndex =
+        lastPairComplete === -1
+          ? currentSelect === -1
+            ? firstLeftEmptyIndex
+            : currentSelect
+          : firstLeftEmptyIndex;
+      let rightIndex = selectedIndices[saveIndex][1];
       setSelectedIndices((prevIndices) => {
-        return prevIndices.map((item, i) => (i === index ? [index, rightIndex] : item));
+        return prevIndices.map((item, i) =>
+          i === saveIndex ? [index, rightIndex] : item
+        );
       });
     }
     // handleSelect(index);
   };
   const handleSelectRight = (index) => {
-    let rightIndex = selectedIndices[index][1];
-    let leftIndex = selectedIndices[index][0];
-    if (rightIndex === index) {
+    let existSelect = selectedIndices.findIndex((item) => item[1] === index);
+    let currentSelect = selectedIndices.findIndex(
+      (item) => item[1] === -1 && item[0] !== -1
+    );
+
+    if (existSelect !== -1) {
+      let leftIndex = selectedIndices[existSelect][0];
+      let lastCurrentSelect = selectedIndices.findLastIndex(
+        (item) => item[0] !== -1 && item[1] === -1
+      );
+      let lastCurrentSelectLeft = lastCurrentSelect === -1 ? -1 : selectedIndices[lastCurrentSelect][0];
       setSelectedIndices((prevIndices) => {
-        return prevIndices.map((item, i) => (i === index ? [-1, -1] : item));
+        return prevIndices.map((item, i) =>
+          i === existSelect
+            ? [-1, -1]
+            : i === lastCurrentSelect
+            ? [lastCurrentSelectLeft, index]
+            : item
+        );
       });
     } else {
+      let lastPairComplete = selectedIndices.findLastIndex(
+        (item) => item[0] !== -1 && item[1] !== -1
+      );
+      currentSelect = selectedIndices.findIndex(
+        (item) => item[0] === -1 && item[1] !== -1
+      );
+      let firstRightEmptyIndex = selectedIndices.findIndex(
+        (item) => item[1] === -1
+      );
+      let saveIndex =
+        lastPairComplete === -1
+          ? currentSelect === -1
+            ? firstRightEmptyIndex
+            : currentSelect
+          : firstRightEmptyIndex;
+      let leftIndex = selectedIndices[saveIndex][0];
       setSelectedIndices((prevIndices) => {
-        return prevIndices.map((item, i) => (i === index ? [leftIndex, index] : item));
+        return prevIndices.map((item, i) =>
+          i === saveIndex ? [leftIndex, index] : item
+        );
       });
     }
   };
@@ -97,6 +162,26 @@ const Matching = ({
     localStorage.getItem("showSolutions") as string
   );
 
+  const convertSelectToAnswer = (selected: any[]) => {
+    const targetIndex = selected.map((item) => item[0]);
+    const result = new Array(questionTargets.length).fill(-1);
+    targetIndex.forEach((item) => {
+      result[item] = item;
+    });
+    const answer= new Array(questionTargets.length).fill(-1);
+    for (let i = 0; i < result.length; i++) {
+      let item = result[i];
+      selected.forEach((select) => {
+        if (select[0] === item) {
+          answer[i] = select[1] !== -1 ? select[1] + 1: -1;
+        }
+      });
+      
+    }
+
+    return answer;
+  };
+
   // Kiểm tra nếu tất cả các lựa chọn đều đúng
   const isAllCorrect =
     selectedIndices.length > 0 &&
@@ -107,7 +192,8 @@ const Matching = ({
         <div className="grid grid-cols-2 gap-4">
           <div className={`grid grid-row-1 gap-8`}>
             {questionTargets.map((choice, index) => {
-              let left = selectedIndices[index][0];
+              let left = selectedIndices.findIndex((item) => item[0] === index);
+              left = left === -1 ? -1 : selectedIndices[left][0];
               const isSelected = left === index;
               return (
                 <button
@@ -134,7 +220,10 @@ const Matching = ({
           </div>
           <div className={`grid grid-row-1 gap-8`}>
             {questionChoices.map((choice, index) => {
-              let right = selectedIndices[index][1];
+              let right = selectedIndices.findIndex(
+                (item) => item[1] === index
+              );
+              right = right === -1 ? -1 : selectedIndices[right][1];
               const isSelected = right === index;
 
               return (
