@@ -2,8 +2,8 @@ import React from "react";
 import QPrompt1_1 from "../../templates/contents/QPrompt1_1";
 import MultipleChoiceQuestion from "../../templates/MutilpleChoice";
 import MultipleResponseQuestion from "../../templates/MutilpleResponse";
-import Matching from "../../templates/Matching";
 import FlyDrag from "../../templates/FlyDrag";
+import Matching from "../../templates/Matching";
 
 const PracticeQuestionLeft = ({
   question,

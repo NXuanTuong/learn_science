@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 
 const ScorePopup = ({
   isPopupCaculationScore,
@@ -10,8 +10,6 @@ const ScorePopup = ({
 }) => {
   const [isLoadingScore, setIsLoadingScore] = useState(true);
   const [correctCount, setCorrectCount] = useState(0);
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (isPopupCaculationScore) {
@@ -107,6 +105,7 @@ const ScorePopup = ({
                     setIsPopupCaculationScore(false);
                     handleQuestionChange(0);
                     localStorage.setItem("scorePractice", correctCount);
+                    localStorage.setItem("maxScore", questions.length);
                   }}
                   className="cursor-pointer px-6 py-3 bg-gradient-to-r
                   from-green-500 to-green-700 text-white font-medium rounded-lg
@@ -115,14 +114,6 @@ const ScorePopup = ({
                 >
                   {" "}
                   📖 Xem lời giải
-                </button>
-
-                {/* Nút đóng (Lấy cảm hứng từ màu của động vật hoang dã, đất) */}
-                <button
-                  className="cursor-pointer px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white font-medium rounded-lg shadow-lg hover:opacity-90 transition-all transform hover:scale-105 active:scale-95"
-                  onClick={() => window.location.reload()}
-                >
-                  ✖ Đóng
                 </button>
               </div>
             </div>

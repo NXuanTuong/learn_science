@@ -3,8 +3,6 @@ import { getListQuestions } from "../config/practice";
 
 const initialState = {
   listQuestions: [],
-  maxScore: 0,
-  currentScore: 0,
   answeredQuestions: [],
 };
 
@@ -74,8 +72,6 @@ export const listQuestions = createSlice({
 
       .addCase(getLessonQuestion.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.maxScore = action.payload.length;
-        state.currentScore = 0;
         // ✅ Khởi tạo listQuestions với mảng userAnswers trống
         state.listQuestions = action.payload.map((question, index) => ({
           ...question,
@@ -91,8 +87,11 @@ export const listQuestions = createSlice({
   },
 });
 
-export const { setQuestionFinished, setUserAnswer, addUserAnswer } =
-  listQuestions.actions;
+export const {
+  setQuestionFinished,
+  setUserAnswer,
+  addUserAnswer,
+} = listQuestions.actions;
 
 export const selectQuestions = (state) => state.listQuestions.question;
 

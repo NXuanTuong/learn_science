@@ -15,12 +15,13 @@ const Matching = ({
   const questionTargets = question.targets;
   const dispatch = useDispatch();
   const initialSelectedIndices = questionTargets.map((_, index) => [-1, -1]);
-
-  const getGridCols = () => {
-    if (questionChoices.length === 5) return "grid-cols-3"; // 3 trên, 2 dưới
-    if (questionChoices.length === 4) return "grid-cols-2"; // 2 trên, 2 dưới
-    return "grid-cols-3"; // 3 trong một hàng
-  };
+  const colors = [
+    "#FF8C00", // Orange
+    "#6A5ACD", // Slate Blue
+    "#FF69B4", // Hot Pink
+    "#20B2AA", // Light Sea Green
+    "#FFD700", // Gold
+  ];
 
   const [selectedIndices, setSelectedIndices] = useState(() => {
     const storedAnswers = localStorage.getItem("userAnswers");
@@ -39,13 +40,12 @@ const Matching = ({
     return initialSelectedIndices; // Trả về mảng rỗng nếu không có dữ liệu hợp lệ
   });
 
-  // mỗi item trong mảng select có dạng [leftIndex, rightIndex]
-  // target => left, choice => right
-
   const handleSelectLeft = (index) => {
-    let existSelect = selectedIndices.findIndex((item) => item[0] === index);
+    let existSelect = selectedIndices.findIndex(
+      (item) => item[0] === index + 1
+    );
     let currentSelect = selectedIndices.findIndex(
-      (item) => item[0] == -1 && item[1] !== -1
+      (item) => item[0] === -1 && item[1] !== -1
     );
 
     if (existSelect !== -1) {
@@ -53,15 +53,31 @@ const Matching = ({
       let lastCurrentSelect = selectedIndices.findLastIndex(
         (item) => item[0] !== -1 && item[1] === -1
       );
-      let lastCurrentSelectRight = lastCurrentSelect === -1 ? -1 : selectedIndices[lastCurrentSelect][1];
+      let lastCurrentSelectRight =
+        lastCurrentSelect === -1 ? -1 : selectedIndices[lastCurrentSelect][1];
+
       setSelectedIndices((prevIndices) => {
-        return prevIndices.map((item, i) =>
+        const newIndices = prevIndices.map((item, i) =>
           i === existSelect
             ? [-1, -1]
             : i === lastCurrentSelect
-            ? [index, lastCurrentSelectRight]
+            ? [index + 1, lastCurrentSelectRight]
             : item
         );
+
+        dispatch(
+          setUserAnswer({
+            id: questionItem._id,
+            answer: newIndices,
+            questionIndex: selectedQuestion,
+            template: "MultipleResponse",
+            userChoice: newIndices
+              .filter((pair) => pair[0] !== -1 && pair[1] !== -1)
+              .map((pair) => pair[1]), // Chỉ lấy cột phải từ cặp hợp lệ
+          })
+        );
+
+        return newIndices;
       });
     } else {
       let lastPairComplete = selectedIndices.findLastIndex(
@@ -81,16 +97,33 @@ const Matching = ({
             : currentSelect
           : firstLeftEmptyIndex;
       let rightIndex = selectedIndices[saveIndex][1];
+
       setSelectedIndices((prevIndices) => {
-        return prevIndices.map((item, i) =>
-          i === saveIndex ? [index, rightIndex] : item
+        const newIndices = prevIndices.map((item, i) =>
+          i === saveIndex ? [index + 1, rightIndex] : item
         );
+
+        dispatch(
+          setUserAnswer({
+            id: questionItem._id,
+            answer: newIndices,
+            questionIndex: selectedQuestion,
+            template: "MultipleResponse",
+            userChoice: newIndices
+              .filter((pair) => pair[0] !== -1 && pair[1] !== -1)
+              .map((pair) => pair[1]), // Chỉ lấy cột phải từ cặp hợp lệ
+          })
+        );
+
+        return newIndices;
       });
     }
-    // handleSelect(index);
   };
+
   const handleSelectRight = (index) => {
-    let existSelect = selectedIndices.findIndex((item) => item[1] === index);
+    let existSelect = selectedIndices.findIndex(
+      (item) => item[1] === index + 1
+    );
     let currentSelect = selectedIndices.findIndex(
       (item) => item[1] === -1 && item[0] !== -1
     );
@@ -100,15 +133,31 @@ const Matching = ({
       let lastCurrentSelect = selectedIndices.findLastIndex(
         (item) => item[0] !== -1 && item[1] === -1
       );
-      let lastCurrentSelectLeft = lastCurrentSelect === -1 ? -1 : selectedIndices[lastCurrentSelect][0];
+      let lastCurrentSelectLeft =
+        lastCurrentSelect === -1 ? -1 : selectedIndices[lastCurrentSelect][0];
+
       setSelectedIndices((prevIndices) => {
-        return prevIndices.map((item, i) =>
+        const newIndices = prevIndices.map((item, i) =>
           i === existSelect
             ? [-1, -1]
             : i === lastCurrentSelect
-            ? [lastCurrentSelectLeft, index]
+            ? [lastCurrentSelectLeft, index + 1]
             : item
         );
+
+        dispatch(
+          setUserAnswer({
+            id: questionItem._id,
+            answer: newIndices,
+            questionIndex: selectedQuestion,
+            template: "MultipleResponse",
+            userChoice: newIndices
+              .filter((pair) => pair[0] !== -1 && pair[1] !== -1)
+              .map((pair) => pair[1]), // Chỉ lấy cột phải từ cặp hợp lệ
+          })
+        );
+
+        return newIndices;
       });
     } else {
       let lastPairComplete = selectedIndices.findLastIndex(
@@ -127,124 +176,156 @@ const Matching = ({
             : currentSelect
           : firstRightEmptyIndex;
       let leftIndex = selectedIndices[saveIndex][0];
+
       setSelectedIndices((prevIndices) => {
-        return prevIndices.map((item, i) =>
-          i === saveIndex ? [leftIndex, index] : item
+        const newIndices = prevIndices.map((item, i) =>
+          i === saveIndex ? [leftIndex, index + 1] : item
         );
+
+        dispatch(
+          setUserAnswer({
+            id: questionItem._id,
+            answer: newIndices,
+            questionIndex: selectedQuestion,
+            template: "MultipleResponse",
+            userChoice: newIndices
+              .filter((pair) => pair[0] !== -1 && pair[1] !== -1)
+              .map((pair) => pair[1]), // Chỉ lấy cột phải từ cặp hợp lệ
+          })
+        );
+
+        return newIndices;
       });
     }
-  };
-
-  const handleSelect = (index) => {
-    setSelectedIndices((prevIndices) => {
-      const updatedIndices = prevIndices.includes(index)
-        ? prevIndices.filter((i) => i !== index) // Bỏ chọn nếu đã chọn trước đó
-        : [...prevIndices, index]; // Thêm vào danh sách nếu chưa chọn
-
-      // Tạo một mảng Boolean với độ dài của questionChoices
-      const answer = questionChoices.map((_, i) => updatedIndices.includes(i));
-
-      dispatch(
-        setUserAnswer({
-          id: questionItem._id,
-          answer: updatedIndices,
-          questionIndex: selectedQuestion,
-          template: "MultipleResponse",
-          userChoice: answer,
-        })
-      );
-
-      return updatedIndices; // Cập nhật state
-    });
   };
 
   const showSolutions = JSON.parse(
     localStorage.getItem("showSolutions") as string
   );
 
-  const convertSelectToAnswer = (selected: any[]) => {
-    const targetIndex = selected.map((item) => item[0]);
-    const result = new Array(questionTargets.length).fill(-1);
-    targetIndex.forEach((item) => {
-      result[item] = item;
-    });
-    const answer= new Array(questionTargets.length).fill(-1);
-    for (let i = 0; i < result.length; i++) {
-      let item = result[i];
-      selected.forEach((select) => {
-        if (select[0] === item) {
-          answer[i] = select[1] !== -1 ? select[1] + 1: -1;
-        }
-      });
-      
-    }
+  const selectedValues = selectedIndices
+    .filter((pair) => pair[0] !== -1 && pair[1] !== -1)
+    .map((pair) => pair[1]);
 
-    return answer;
-  };
-
-  // Kiểm tra nếu tất cả các lựa chọn đều đúng
   const isAllCorrect =
-    selectedIndices.length > 0 &&
-    selectedIndices.every((index) => question.solutions[index]);
+    selectedValues.length === question.solutions.length &&
+    new Set(selectedValues).size === new Set(question.solutions).size &&
+    selectedValues.every((value) => question.solutions.includes(value));
+
+  const getColorForIndex = (index: number) => colors[index % colors.length];
+
   return (
     <>
       <div className="flex flex-col gap-8 justify-center items-center">
-        <div className="grid grid-cols-2 gap-4">
-          <div className={`grid grid-row-1 gap-8`}>
+        <div className="grid grid-cols-2 gap-20">
+          <div className="grid grid-cols-1 gap-4 place-items-center w-full">
             {questionTargets.map((choice, index) => {
-              let left = selectedIndices.findIndex((item) => item[0] === index);
-              left = left === -1 ? -1 : selectedIndices[left][0];
-              const isSelected = left === index;
+              const pairIndex = selectedIndices.findIndex(
+                (item) => item[0] === index + 1
+              );
+              const isSelected = pairIndex !== -1;
+              const selectedValue = isSelected
+                ? selectedIndices[pairIndex][1]
+                : null;
+              const correctAnswer = question.solutions[index];
+              const isCorrect = selectedValue === correctAnswer;
+
+              // Giữ màu nếu đã chọn trước đó, nếu không thì hiển thị đáp án đúng khi showSolutions bật
+              const backgroundColor = isSelected
+                ? getColorForIndex(pairIndex) // Giữ màu nếu đã chọn
+                : showSolutions
+                ? "white" // Màu nhạt hiển thị khi có đáp án (màu xanh nhạt)
+                : "white"; // Mặc định trắng khi chưa chọn và chưa hiển thị đáp án
+
               return (
                 <button
                   key={index}
                   onClick={() => handleSelectLeft(index)}
                   disabled={JSON.parse(showSolutions)}
-                  className={`w-[9rem] h-[3.5rem] cursor-pointer p-3 text-lg font-bold rounded-full transition-all duration-300 ease-in-out
-              ${
-                isSelected // Kiểm tra nếu index nằm trong danh sách lựa chọn
-                  ? JSON.parse(showSolutions)
-                    ? question.solutions[index] // Kiểm tra đúng/sai từ solutions
-                      ? "bg-green-500 text-white shadow-[0px_4px_0px_#1B5E20] scale-105 border border-white" // Đúng -> Xanh
-                      : "bg-red-500 text-white shadow-[0px_4px_0px_#8B0000] scale-105 border border-white" // Sai -> Đỏ
-                    : "bg-green-700 text-white shadow-[0px_4px_0px_#1B5E20] scale-105 border border-white" // Khi chọn trước khi xem đáp án
-                  : "bg-white text-green-900 shadow-[2px_2px_0px_#1B5E20] border border-green"
-              }
-              hover:from-green-400 hover:to-green-600 hover:shadow-[1px_1px_0px_#1B5E20]
-              active:shadow-none active:translate-y-[2px] active:translate-x-[2px]`}
+                  style={{
+                    backgroundColor,
+                    color: isSelected ? "white" : "#2E7D32",
+                    outlineColor: showSolutions
+                      ? isCorrect
+                        ? "#1B5E20" // Viền xanh nếu đúng
+                        : "#B71C1C" // Viền đỏ nếu sai
+                      : "#4CAF50",
+                  }}
+                  className={`min-w-[150px] px-6 py-3 text-lg font-bold rounded-lg transition-all duration-200 ease-in-out
+          flex items-center justify-center text-center whitespace-normal break-words relative
+          ${
+            showSolutions
+              ? isCorrect
+                ? "outline-2 outline-green-700"
+                : "outline-2 outline-red-700"
+              : "outline outline-green-500"
+          }
+          hover:brightness-110 hover:shadow-md active:scale-95 active:shadow-none`}
                 >
                   {choice}
+
+                  {/* Nếu showSolutions bật, luôn hiển thị icon đúng/sai */}
+                  {showSolutions && (
+                    <span className="absolute right-2 top-2 text-lg">
+                      {isCorrect ? "✅" : "❌"}
+                    </span>
+                  )}
                 </button>
               );
             })}
           </div>
-          <div className={`grid grid-row-1 gap-8`}>
+
+          <div className="grid grid-cols-1 gap-4 place-items-center w-full">
             {questionChoices.map((choice, index) => {
-              let right = selectedIndices.findIndex(
-                (item) => item[1] === index
+              const pairIndex = selectedIndices.findIndex(
+                (item) => item[1] === index + 1
               );
-              right = right === -1 ? -1 : selectedIndices[right][1];
-              const isSelected = right === index;
+              const isSelected = pairIndex !== -1;
+              const selectedValue = isSelected
+                ? selectedIndices[pairIndex][0]
+                : null;
+              const correctAnswer = question.solutions[index];
+              const isCorrect = selectedValue === correctAnswer;
+
+              const backgroundColor = isSelected
+                ? getColorForIndex(pairIndex) // Giữ màu nếu đã chọn
+                : showSolutions
+                ? "white"
+                : "white";
 
               return (
                 <button
                   key={index}
                   onClick={() => handleSelectRight(index)}
-                  disabled={JSON.parse(showSolutions)}
-                  className={`w-[9rem] h-[3.5rem] cursor-pointer p-3 text-lg font-bold rounded-full transition-all duration-300 ease-in-out
-              ${
-                isSelected // Kiểm tra nếu index nằm trong danh sách lựa chọn
-                  ? JSON.parse(showSolutions)
-                    ? question.solutions[index] // Kiểm tra đúng/sai từ solutions
-                      ? "bg-green-500 text-white shadow-[0px_4px_0px_#1B5E20] scale-105 border border-white" // Đúng -> Xanh
-                      : "bg-red-500 text-white shadow-[0px_4px_0px_#8B0000] scale-105 border border-white" // Sai -> Đỏ
-                    : "bg-green-700 text-white shadow-[0px_4px_0px_#1B5E20] scale-105 border border-white" // Khi chọn trước khi xem đáp án
-                  : "bg-white text-green-900 shadow-[2px_2px_0px_#1B5E20] border border-green"
-              }
-              hover:from-green-400 hover:to-green-600 hover:shadow-[1px_1px_0px_#1B5E20]
-              active:shadow-none active:translate-y-[2px] active:translate-x-[2px]`}
+                  disabled={showSolutions}
+                  style={{
+                    backgroundColor,
+                    color: isSelected ? "white" : "#2E7D32",
+                    outlineColor: showSolutions
+                      ? isCorrect
+                        ? "#1B5E20" // Viền xanh nếu đúng
+                        : "#B71C1C" // Viền đỏ nếu sai
+                      : "#4CAF50",
+                  }}
+                  className={`min-w-[150px] cursor-pointer px-6 py-3 text-lg font-bold rounded-lg transition-all duration-200 ease-in-out
+          flex items-center justify-center text-center whitespace-normal break-words relative
+          ${
+            showSolutions
+              ? isCorrect
+                ? "outline-2 outline-green-700"
+                : "outline-2 outline-red-700"
+              : "outline outline-green-500"
+          }
+          hover:brightness-110 hover:shadow-md active:scale-95 active:shadow-none`}
                 >
                   {choice}
+
+                  {/* Nếu showSolutions bật, luôn hiển thị icon đúng/sai */}
+                  {showSolutions && (
+                    <span className="absolute right-2 top-2 text-lg">
+                      {isCorrect ? "✅" : "❌"}
+                    </span>
+                  )}
                 </button>
               );
             })}
@@ -272,20 +353,67 @@ const Matching = ({
               <p className="text-lg font-bold text-gray-800 mb-2">
                 🎯 Đáp án đúng:
               </p>
-              {questionChoices.map((choice, index) =>
-                question.solutions[index] ? ( // Chỉ hiển thị nếu đúng (true)
-                  <button
-                    key={index}
-                    disabled={JSON.parse(showSolutions)}
-                    className={`w-[9rem] h-[3.5rem] cursor-pointer p-3 text-lg font-bold rounded-full relative transition-all duration-300 ease-in-out
-                      bg-green-500 text-white shadow-[0px_4px_0px_#1B5E20] scale-105 border border-white
-                      hover:from-green-400 hover:to-green-600 hover:shadow-[1px_1px_0px_#1B5E20]
-                      active:shadow-none active:translate-y-[2px] active:translate-x-[2px]`}
-                  >
-                    {choice}
-                  </button>
-                ) : null
-              )}
+
+              <div className="grid grid-cols-2 gap-20">
+                {/* Cột trái - Giữ màu đã chọn và check đúng sai */}
+                <div className="grid grid-cols-1 gap-4 place-items-center w-full">
+                  {questionTargets.map((choice, index) => {
+                    const pairIndex = selectedIndices.findIndex(
+                      (item) => item[0] === index + 1
+                    );
+                    const isSelected = pairIndex !== -1;
+
+                    // Giữ nguyên màu background nếu đã nối trước đó
+                    const backgroundColor = isSelected
+                      ? getColorForIndex(pairIndex) // Nếu đã chọn thì giữ màu của lần chọn
+                      : getColorForIndex(index); // Nếu chưa chọn thì lấy màu mặc định theo index
+
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => handleSelectLeft(index)}
+                        disabled={JSON.parse(showSolutions)}
+                        className={`min-w-[150px] px-6 py-3 text-white text-lg font-bold rounded-lg transition-all duration-200 ease-in-out
+            flex items-center justify-center text-center whitespace-normal break-words
+            border-2 border-green-700 
+            hover:brightness-110 hover:shadow-md active:scale-95 active:shadow-none relative`}
+                        style={{ backgroundColor }}
+                      >
+                        {choice}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Cột phải - Hiển thị đúng đáp án theo solutions */}
+                <div className="grid grid-cols-1 gap-4 place-items-center w-full">
+                  {questionChoices.map((choice, index) => {
+                    const correctTargetIndex = question.solutions.indexOf(
+                      index + 1
+                    ); // Tìm vị trí đúng của câu trả lời này
+                    const isSelected = selectedIndices.some(
+                      (item) => item[1] === index + 1
+                    );
+                    const backgroundColor =
+                      correctTargetIndex !== -1
+                        ? getColorForIndex(correctTargetIndex)
+                        : "white";
+
+                    return (
+                      <button
+                        key={index}
+                        className={`min-w-[150px] px-6 py-3 text-white text-lg font-bold rounded-lg transition-all duration-200 ease-in-out
+            flex items-center justify-center text-center whitespace-normal break-words
+            border-2 border-green-700 
+            hover:brightness-110 hover:shadow-md active:scale-95 active:shadow-none relative`}
+                        style={{ backgroundColor }}
+                      >
+                        {choice}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </div>
         )}

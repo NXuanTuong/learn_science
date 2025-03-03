@@ -22,7 +22,7 @@ function QPrompt1_1({ data, order, isLast }) {
   return (
     <>
       <div
-        className={`rounded-t-xl text-[1.25rem] p-[2rem_2rem_3rem] leading-[160%] gap-8 flex flex-col justify-center items-center`}
+        className={`rounded-t-xl text-[1.25rem] p-[2rem_2rem_1rem] leading-[160%] gap-8 flex flex-col justify-center items-center`}
       >
         <div
           className={` max-w-[40rem] gap-4 flex flex-col justify-center items-center`}

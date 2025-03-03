@@ -21,7 +21,6 @@ const PracticeQuestionRight = ({
 
   const handleConfirmExit = () => {
     setIsPopupOpen(false);
-    localStorage.clear();
     navigate("/trang_hoc_chinh/luyen_tap_thuc_hanh");
   };
 
@@ -222,7 +221,7 @@ const PracticeQuestionRight = ({
         />
       )}
 
-      <div className="fixed right-0 flex flex-col w-75 h-full z-[1000] justify-center items-center">
+      <div className="fixed right-0 flex flex-col w-75 h-screen top-[150px] z-[1000]">
         <div className="flex flex-col p-[2.5rem_1.5rem_1.5rem] rounded-[2.5rem_2.5rem_1.5rem_1.5rem] border border-[1.5px] border-[#0A2A66] shadow-[0.3rem_0.3rem_0rem_#1B5E20] w-64 gap-[1rem] relative justify-between bg-[#fafbfc]">
           <div
             onClick={handleCloseQuestions}
@@ -248,11 +247,7 @@ const PracticeQuestionRight = ({
               );
 
               const hasValidAnswer =
-                userAnswer &&
-                (typeof userAnswer.answer === "number" ||
-                  (Array.isArray(userAnswer.answer) &&
-                    userAnswer.answer.length > 0));
-
+                userAnswer && userAnswer?.userChoice?.length > 0;
               return (
                 <button
                   key={index}
@@ -260,8 +255,8 @@ const PracticeQuestionRight = ({
                   className={`px-4 h-[2.7rem] cursor-pointer border-2 font-semibold rounded-xl transition-all duration-300
                   ${
                     showSolutions
-                      ? questions[index].question.solutions.toString() ===
-                        userAnswers[index].userChoice.toString()
+                      ? questions[index].question.solutions?.toString() ===
+                        userAnswers[index].userChoice?.toString()
                         ? "bg-gradient-to-r from-green-400 to-green-600 text-white border-green-700 shadow-[0_4px_15px_rgba(34,197,94,0.5)] hover:shadow-[0_6px_20px_rgba(34,197,94,0.7)] ring-2 ring-green-300 drop-shadow-xl scale-105"
                         : "bg-gradient-to-r from-red-400 to-red-600 text-white border-red-700 shadow-[0_4px_15px_rgba(239,68,68,0.5)] hover:shadow-[0_6px_20px_rgba(239,68,68,0.7)] ring-2 ring-red-300 drop-shadow-xl scale-105"
                       : hasValidAnswer

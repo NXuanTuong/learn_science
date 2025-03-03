@@ -16,12 +16,6 @@ const FlyDrag = ({
   const questionSolutions = question.solutions;
   const dispatch = useDispatch();
 
-  const getGridCols = () => {
-    if (questionChoices.length === 5) return "grid-cols-3"; // 3 trên, 2 dưới
-    if (questionChoices.length === 4) return "grid-cols-2"; // 2 trên, 2 dưới
-    return "grid-cols-3"; // 3 trong một hàng
-  };
-
   const [selectedIndices, setSelectedIndices] = useState(() => {
     const storedAnswers = localStorage.getItem("userAnswers");
 
@@ -37,14 +31,16 @@ const FlyDrag = ({
     return []; // Trả về mảng rỗng nếu không có dữ liệu hợp lệ
   });
 
-  const handleSelect = (index) => {
-    setSelectedIndices((prevIndices) => {
-      const updatedIndices = prevIndices.includes(index)
-        ? prevIndices.filter((i) => i !== index) // Bỏ chọn nếu đã chọn trước đó
-        : [...prevIndices, index]; // Thêm vào danh sách nếu chưa chọn
+  const handleSelect = (index: number) => {
+    setSelectedIndices((prev) => {
+      let updatedIndices = [...prev];
 
-      // Tạo một mảng Boolean với độ dài của questionChoices
-      const answer = questionChoices.map((_, i) => updatedIndices.includes(i));
+      const emptyIndex = updatedIndices.findIndex((i) => i === -1);
+      if (emptyIndex !== -1) {
+        updatedIndices[emptyIndex] = index;
+      } else {
+        updatedIndices.push(index);
+      }
 
       dispatch(
         setUserAnswer({
@@ -52,11 +48,32 @@ const FlyDrag = ({
           answer: updatedIndices,
           questionIndex: selectedQuestion,
           template: "MultipleResponse",
-          userChoice: answer,
+          userChoice: updatedIndices,
         })
       );
 
-      return updatedIndices; // Cập nhật state
+      return updatedIndices;
+    });
+  };
+
+  // Khi bấm vào choice trên câu hỏi để đưa về danh sách gốc
+  const handleDeselect = (index: number) => {
+    setSelectedIndices((prev) => {
+      let updatedIndices = prev.map((i, idx) => (idx === index ? -1 : i));
+      const allRemoved = updatedIndices.every((i) => i === -1); // Kiểm tra nếu chỉ toàn `-1`
+      const finalAnswer = allRemoved ? [] : updatedIndices;
+
+      dispatch(
+        setUserAnswer({
+          id: questionItem._id,
+          answer: finalAnswer,
+          questionIndex: selectedQuestion,
+          template: "MultipleResponse",
+          userChoice: finalAnswer,
+        })
+      );
+
+      return finalAnswer ?? [];
     });
   };
 
@@ -64,55 +81,85 @@ const FlyDrag = ({
     localStorage.getItem("showSolutions") as string
   );
 
-  // Kiểm tra nếu tất cả các lựa chọn đều đúng
   const isAllCorrect =
-    selectedIndices.length > 0 &&
-    selectedIndices.every((index) => question.solutions[index]);
+    JSON.stringify(selectedIndices) === JSON.stringify(question.solutions);
 
   return (
     <>
       <div className="flex flex-col gap-8 justify-center items-center">
         {questionTexts && questionTexts?.length > 0 && (
-          <div className="flex flex-row gap-4">
-            {questionTexts.map((text, index) => (
+          <div className="flex flex-row gap-6 p-4 bg-gradient-to-r from-green-200 to-blue-200 rounded-xl shadow-lg">
+            {questionTexts.map((text: any, index: any) => (
               <div
                 key={index}
-                className="text-2xl font-bold text-center flex flex-row gap-2"
+                className="text-center flex flex-row items-center gap-4"
               >
-                <p>{text}</p>
+                {/* Câu hỏi */}
+                <p className="text-xl font-semibold text-green-900">{text}</p>
+
                 {index < questionTexts.length - 1 && (
-                  <div>
+                  <>
                     {selectedIndices[index] !== undefined ? (
-                      <div>{questionChoices[selectedIndices[index]]}</div>
+                      <div className="flex flex-col items-center">
+                        {questionChoices[selectedIndices[index]] !==
+                          undefined && (
+                          <div
+                            onClick={() => {
+                              if (!showSolutions) {
+                                handleDeselect(index);
+                              }
+                            }}
+                            className={`${
+                              showSolutions
+                                ? questionSolutions[index] ===
+                                  selectedIndices[index]
+                                  ? "bg-green-600" // Đúng khi showSolutions bật
+                                  : "bg-red-600" // Sai khi showSolutions bật
+                                : "bg-green-600" // Mặc định xanh khi showSolutions tắt
+                            } text-white px-4 py-2 rounded-xl shadow-lg transition-transform duration-300 ease-in-out hover:scale-110 cursor-pointer flex items-center gap-2`}
+                          >
+                            {questionChoices[selectedIndices[index]]}
+                          </div>
+                        )}
+
+                        {/* Hiệu ứng đường kẻ */}
+                        <div className="w-16 h-1 bg-green-700 mt-2 rounded-full transition-all duration-300"></div>
+                      </div>
                     ) : (
-                      <div
-                        style={{
-                          width: "4rem",
-                          height: "2rem",
-                          borderBottom: "2px solid #0A2A66",
-                        }}
-                      ></div>
+                      <div className="w-16 h-1 bg-gray-300 mt-4 rounded-full"></div>
                     )}
-                  </div>
+                  </>
                 )}
               </div>
             ))}
           </div>
         )}
         <div className={`gap-4 grid grid-cols-4 `}>
-          {questionChoices.map((choice, index) => {
+          {questionChoices.map((choice: any, index: any) => {
             const isSelected = selectedIndices?.includes(index);
+
+            const storedAnswers = localStorage.getItem("userAnswers");
+
+            const parsedAnswers = JSON.parse(storedAnswers);
 
             return (
               <>
                 {isSelected ? (
-                  <></>
+                  <div key={index}></div>
                 ) : (
-                  <button
-                    key={index}
-                    onClick={() => handleSelect(index)}
-                    disabled={JSON.parse(showSolutions)}
-                    className={`w-[9rem] h-[3.5rem] cursor-pointer p-3 text-lg font-bold rounded-full transition-all duration-300 ease-in-out
+                  !selectedIndices.includes(index) && (
+                    <button
+                      key={index}
+                      onClick={() => handleSelect(index)}
+                      disabled={
+                        JSON.parse(showSolutions) ||
+                        (parsedAnswers[selectedQuestion].userChoice?.length ===
+                          questionSolutions.length &&
+                          !parsedAnswers[selectedQuestion].userChoice?.includes(
+                            -1
+                          ))
+                      }
+                      className={`w-[9rem] h-[3.5rem] cursor-pointer p-3 text-lg font-bold rounded-full transition-all duration-300 ease-in-out
                       ${
                         selectedIndices.includes(index) // Kiểm tra nếu index nằm trong danh sách lựa chọn
                           ? JSON.parse(showSolutions)
@@ -124,9 +171,10 @@ const FlyDrag = ({
                       }
                       hover:from-green-400 hover:to-green-600 hover:shadow-[1px_1px_0px_#1B5E20]
                       active:shadow-none active:translate-y-[2px] active:translate-x-[2px]`}
-                  >
-                    {choice}
-                  </button>
+                    >
+                      {choice}
+                    </button>
+                  )
                 )}
               </>
             );
@@ -154,19 +202,35 @@ const FlyDrag = ({
               <p className="text-lg font-bold text-gray-800 mb-2">
                 🎯 Đáp án đúng:
               </p>
-              {questionChoices.map((choice, index) =>
-                question.solutions[index] ? ( // Chỉ hiển thị nếu đúng (true)
-                  <button
-                    key={index}
-                    disabled={JSON.parse(showSolutions)}
-                    className={`w-[9rem] h-[3.5rem] cursor-pointer p-3 text-lg font-bold rounded-full relative transition-all duration-300 ease-in-out
-                      bg-green-500 text-white shadow-[0px_4px_0px_#1B5E20] scale-105 border border-white
-                      hover:from-green-400 hover:to-green-600 hover:shadow-[1px_1px_0px_#1B5E20]
-                      active:shadow-none active:translate-y-[2px] active:translate-x-[2px]`}
-                  >
-                    {choice}
-                  </button>
-                ) : null
+              {questionTexts && questionTexts?.length > 0 && (
+                <div className="flex flex-row gap-6 p-4 bg-gradient-to-r from-green-200 to-blue-200 rounded-xl shadow-lg">
+                  {questionTexts.map((text: any, index: any) => (
+                    <div
+                      key={index}
+                      className="text-center flex flex-row items-center gap-4"
+                    >
+                      {/* Câu hỏi */}
+                      <p className="text-xl font-semibold text-green-900">
+                        {text}
+                      </p>
+
+                      {index < questionTexts.length - 1 && (
+                        <>
+                          <div className="flex flex-col items-center">
+                            {/* Lựa chọn được chọn */}
+
+                            <div className="bg-green-600 text-white px-4 py-2 rounded-xl shadow-lg transition-transform duration-300 ease-in-out hover:scale-110 cursor-pointer flex items-center gap-2">
+                              {questionChoices[questionSolutions[index]]}
+                            </div>
+
+                            {/* Hiệu ứng đường kẻ */}
+                            <div className="w-16 h-1 bg-green-700 mt-2 rounded-full transition-all duration-300"></div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           </div>
