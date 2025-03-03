@@ -208,9 +208,7 @@ const Matching = ({
     .map((pair) => pair[1]);
 
   const isAllCorrect =
-    selectedValues.length === question.solutions.length &&
-    new Set(selectedValues).size === new Set(question.solutions).size &&
-    selectedValues.every((value) => question.solutions.includes(value));
+    JSON.stringify(selectedValues) === JSON.stringify(question.solutions);
 
   const getColorForIndex = (index: number) => colors[index % colors.length];
 
