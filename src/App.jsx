@@ -3,6 +3,7 @@ import RegistrationScreen from "./layouts/auth/registration/RegistrationScreen";
 import SignInScreen from "./layouts/auth/sign-in/SignInScreen";
 import HomeScreen from "./layouts/home/HomeScreen";
 import PracticeQuestionMainScreen from "./layouts/practice_question/PracticeQuestionMainScreen";
+import PracticeQuizMainScreen from "./layouts/practice_quiz/PracticeQuizMainScreen";
 import PracticeExercises from "./layouts/study_screen/PracticeExercises";
 import ScientificDiscovery from "./layouts/study_screen/ScientificDiscovery";
 import StudyMainScreen from "./layouts/study_screen/StudyMainScreen";
@@ -21,6 +22,10 @@ function App() {
         <Route
           path="/cau_hoi_luyen_tap"
           element={<PracticeQuestionMainScreen />}
+        />
+        <Route
+          path="/bai_kiem_tra_thuc_hanh"
+          element={<PracticeQuizMainScreen />}
         />
       </Routes>
     </>

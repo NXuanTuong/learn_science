@@ -1,7 +1,8 @@
 export interface QuestionTemplateProps {
-  question: any; 
+  question: any;
   selectedQuestion: number;
+  questionId: String;
   handleQuestionChange: (val: any) => void;
-  questions: any[]; 
-  questionItem: any; 
+  questions: any[];
+  questionItem: any;
 }

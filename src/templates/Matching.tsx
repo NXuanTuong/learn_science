@@ -67,7 +67,10 @@ const Matching = ({
 
         dispatch(
           setUserAnswer({
-            id: questionItem._id,
+            id:
+              window.location.pathname === "/bai_kiem_tra_thuc_hanh"
+                ? questionItem.questionId
+                : questionItem._id,
             answer: newIndices,
             questionIndex: selectedQuestion,
             template: "MultipleResponse",
@@ -75,6 +78,13 @@ const Matching = ({
               .filter((pair) => pair[0] !== -1 && pair[1] !== -1)
               .map((pair) => pair[1]), // Chỉ lấy cột phải từ cặp hợp lệ
           })
+        );
+
+        saveAnswer(
+          newIndices
+            .filter((pair) => pair[0] !== -1 && pair[1] !== -1)
+            .map((pair) => pair[1]),
+          questionItem.questionId
         );
 
         return newIndices;
@@ -105,7 +115,10 @@ const Matching = ({
 
         dispatch(
           setUserAnswer({
-            id: questionItem._id,
+            id:
+              window.location.pathname === "/bai_kiem_tra_thuc_hanh"
+                ? questionItem.questionId
+                : questionItem._id,
             answer: newIndices,
             questionIndex: selectedQuestion,
             template: "MultipleResponse",
@@ -113,6 +126,13 @@ const Matching = ({
               .filter((pair) => pair[0] !== -1 && pair[1] !== -1)
               .map((pair) => pair[1]), // Chỉ lấy cột phải từ cặp hợp lệ
           })
+        );
+
+        saveAnswer(
+          newIndices
+            .filter((pair) => pair[0] !== -1 && pair[1] !== -1)
+            .map((pair) => pair[1]),
+          questionItem.questionId
         );
 
         return newIndices;
@@ -147,7 +167,10 @@ const Matching = ({
 
         dispatch(
           setUserAnswer({
-            id: questionItem._id,
+            id:
+              window.location.pathname === "/bai_kiem_tra_thuc_hanh"
+                ? questionItem.questionId
+                : questionItem._id,
             answer: newIndices,
             questionIndex: selectedQuestion,
             template: "MultipleResponse",
@@ -155,6 +178,13 @@ const Matching = ({
               .filter((pair) => pair[0] !== -1 && pair[1] !== -1)
               .map((pair) => pair[1]), // Chỉ lấy cột phải từ cặp hợp lệ
           })
+        );
+
+        saveAnswer(
+          newIndices
+            .filter((pair) => pair[0] !== -1 && pair[1] !== -1)
+            .map((pair) => pair[1]),
+          questionItem.questionId
         );
 
         return newIndices;
@@ -184,7 +214,10 @@ const Matching = ({
 
         dispatch(
           setUserAnswer({
-            id: questionItem._id,
+            id:
+              window.location.pathname === "/bai_kiem_tra_thuc_hanh"
+                ? questionItem.questionId
+                : questionItem._id,
             answer: newIndices,
             questionIndex: selectedQuestion,
             template: "MultipleResponse",
@@ -194,9 +227,41 @@ const Matching = ({
           })
         );
 
+        saveAnswer(
+          newIndices
+            .filter((pair) => pair[0] !== -1 && pair[1] !== -1)
+            .map((pair) => pair[1]),
+          questionItem.questionId
+        );
+
         return newIndices;
       });
     }
+  };
+
+  const saveAnswer = (answer, questionId) => {
+    const submit = {
+      submit: false,
+      questions: [
+        {
+          answer: answer,
+          questionId: questionId,
+          questionIndex: selectedQuestion,
+        },
+      ],
+    };
+
+    const questionsAnswered = [
+      {
+        answer: answer,
+        questionId: questionId,
+        questionIndex: selectedQuestion,
+      },
+    ];
+
+    const value = { questionsAnswered, submit };
+
+    localStorage.setItem("questionStateExams", JSON.stringify(value));
   };
 
   const showSolutions = JSON.parse(

@@ -1,16 +1,18 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setUserAnswer } from "../store/listQuestionSlice";
 import { QuestionTemplateProps } from "../interface/question";
 import React from "react";
+import { selectAnsweredQuestions } from "../store/quizQuestionSlice";
 
 const MultipleChoiceQuestion = ({
   questionItem,
   question,
   selectedQuestion,
+  questionId,
   handleQuestionChange,
   questions,
-}:QuestionTemplateProps) => {
+}: QuestionTemplateProps) => {
   const questionChoices = question.choices;
   const dispatch = useDispatch();
   const getGridCols = () => {
@@ -18,6 +20,7 @@ const MultipleChoiceQuestion = ({
     if (questionChoices.length === 4) return "grid-cols-2"; // 2 trên, 2 dưới
     return "grid-cols-3"; // 3 trong một hàng
   };
+  const answeredQuestions = useSelector(selectAnsweredQuestions);
 
   const [selectedIndex, setSelectedIndex] = useState(() => {
     const storedAnswers = localStorage.getItem("userAnswers");
@@ -35,6 +38,13 @@ const MultipleChoiceQuestion = ({
   });
 
   const handleSelect = (index) => {
+    if (window.location.pathname === "/bai_kiem_tra_thuc_hanh") {
+      if (selectedIndex === index) {
+        saveAnswer(-1);
+      } else {
+        saveAnswer(index);
+      }
+    }
     setSelectedIndex((prevIndex) => (prevIndex === index ? null : index));
 
     const answer = questionChoices.map((item) => false);
@@ -42,7 +52,10 @@ const MultipleChoiceQuestion = ({
 
     dispatch(
       setUserAnswer({
-        id: questionItem._id,
+        id:
+          window.location.pathname === "/bai_kiem_tra_thuc_hanh"
+            ? questionItem.questionId
+            : questionItem._id,
         answer: index,
         questionIndex: selectedQuestion,
         template: "MultipleChoice",
@@ -51,7 +64,77 @@ const MultipleChoiceQuestion = ({
     );
   };
 
-  const showSolutions = JSON.parse(localStorage.getItem("showSolutions") as any);
+  const saveAnswer = (index) => {
+    var questionState = {
+      index: selectedQuestion,
+      state: {
+        selected: Number(index),
+      },
+    };
+    let answer = questionChoices.map((item) => false);
+    answer[index] = true;
+    if (index !== -1) {
+      answer[index] = true;
+    } else {
+      answer = null;
+    }
+
+    let newAnswer = {
+      questionId: questionId,
+      answer: answer,
+      questionIndex: selectedQuestion,
+      selected: index,
+    };
+
+    // setSelected(selected);
+    let result = [...answeredQuestions];
+    if (result.length === 0) {
+      result.push(newAnswer);
+    } else {
+      let flag = true;
+      for (let question = 0; question < answeredQuestions.length; question++) {
+        if (answeredQuestions[question].questionId === newAnswer.questionId) {
+          flag = true;
+          break;
+        } else {
+          flag = false;
+        }
+      }
+      if (!flag) {
+        result.push(newAnswer);
+      } else {
+        result = answeredQuestions.map((question) =>
+          question.questionId === questionId ? newAnswer : question
+        );
+      }
+    }
+
+    var questionsAnswered = result;
+
+    const submit = { submit: false, questions: [newAnswer] };
+    var questionAnswered = { questionIndex: selectedQuestion, status: true };
+
+    if (index === -1) {
+      questionAnswered.status = false;
+    }
+
+    const value = {
+      questionState,
+      questionAnswered,
+      questionsAnswered,
+      submit,
+    };
+  
+    localStorage.setItem("questionStateExams", JSON.stringify(value));
+  };
+
+  const handleNextQuestion = () => {
+    handleQuestionChange(selectedQuestion + 1);
+  };
+
+  const showSolutions = JSON.parse(
+    localStorage.getItem("showSolutions") as any
+  );
 
   return (
     <>
@@ -144,7 +227,7 @@ const MultipleChoiceQuestion = ({
         {questions.length - 1 !== selectedQuestion ? (
           selectedIndex != null ? (
             <button
-              onClick={() => handleQuestionChange(selectedQuestion + 1)}
+              onClick={() => handleNextQuestion()}
               className="px-6 cursor-pointer py-3 text-lg font-bold rounded-full transition-all duration-300 
              bg-gradient-to-b from-white to-green-300 text-green-900 shadow-md 
              hover:from-green-200 hover:to-green-500 hover:shadow-lg 

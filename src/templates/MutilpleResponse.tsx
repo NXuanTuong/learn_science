@@ -1,16 +1,18 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setUserAnswer } from "../store/listQuestionSlice";
 import { QuestionTemplateProps } from "../interface/question";
 import React from "react";
+import { selectAnsweredQuestions } from "../store/quizQuestionSlice";
 
 const MultipleResponseQuestion = ({
   question,
   selectedQuestion,
   handleQuestionChange,
+  questionId,
   questions,
   questionItem,
-}:QuestionTemplateProps) => {
+}: QuestionTemplateProps) => {
   const questionChoices = question.choices;
   const dispatch = useDispatch();
 
@@ -19,6 +21,8 @@ const MultipleResponseQuestion = ({
     if (questionChoices.length === 4) return "grid-cols-2"; // 2 trên, 2 dưới
     return "grid-cols-3"; // 3 trong một hàng
   };
+
+  const answeredQuestions = useSelector(selectAnsweredQuestions);
 
   const [selectedIndices, setSelectedIndices] = useState(() => {
     const storedAnswers = localStorage.getItem("userAnswers");
@@ -36,6 +40,14 @@ const MultipleResponseQuestion = ({
   });
 
   const handleSelect = (index) => {
+    if (window.location.pathname === "/bai_kiem_tra_thuc_hanh") {
+      if (selectedIndices.includes(index)) {
+        saveAnswer(selectedIndices.filter((item) => item !== index));
+      } else {
+        saveAnswer([...selectedIndices, index]);
+      }
+    }
+
     setSelectedIndices((prevIndices) => {
       const updatedIndices = prevIndices.includes(index)
         ? prevIndices.filter((i) => i !== index) // Bỏ chọn nếu đã chọn trước đó
@@ -46,7 +58,10 @@ const MultipleResponseQuestion = ({
 
       dispatch(
         setUserAnswer({
-          id: questionItem._id,
+          id:
+            window.location.pathname === "/bai_kiem_tra_thuc_hanh"
+              ? questionItem.questionId
+              : questionItem._id,
           answer: updatedIndices,
           questionIndex: selectedQuestion,
           template: "MultipleResponse",
@@ -58,7 +73,72 @@ const MultipleResponseQuestion = ({
     });
   };
 
-  const showSolutions = JSON.parse(localStorage.getItem("showSolutions") as any);
+  const saveAnswer = (index) => {
+    let questionState = {
+      index: selectedQuestion,
+      state: {
+        selected: index,
+      },
+    };
+    let answer = questionChoices.map((item) => false);
+    index.map((item) => (answer[item] = true));
+
+    if (index.length > 0) {
+      index.map((item) => (answer[item] = true));
+    } else {
+      answer = null;
+    }
+
+    var newAnswer = {
+      questionId: questionId,
+      answer: answer,
+      questionIndex: selectedQuestion,
+      selected: index,
+    };
+    // setSelected(selected);
+    var result = [...answeredQuestions];
+    if (result.length === 0) {
+      result.push(newAnswer);
+    } else {
+      var flag = true;
+      for (let question = 0; question < answeredQuestions.length; question++) {
+        if (answeredQuestions[question].questionId === newAnswer.questionId) {
+          flag = true;
+          break;
+        } else {
+          flag = false;
+        }
+      }
+      if (!flag) {
+        result.push(newAnswer);
+      } else {
+        result = answeredQuestions.map((question) =>
+          question.questionId === questionId ? newAnswer : question
+        );
+      }
+    }
+    var questionsAnswered = result;
+
+    const submit = { submit: false, questions: [newAnswer] };
+    var questionAnswered = { questionIndex: selectedQuestion, status: true };
+
+    if (index.length === 0) {
+      questionAnswered.status = false;
+    }
+
+    const value = {
+      questionState,
+      questionAnswered,
+      questionsAnswered,
+      submit,
+    };
+
+    localStorage.setItem("questionStateExams", JSON.stringify(value));
+  };
+
+  const showSolutions = JSON.parse(
+    localStorage.getItem("showSolutions") as any
+  );
 
   // Kiểm tra nếu tất cả các lựa chọn đều đúng
   const isAllCorrect =

@@ -6,6 +6,14 @@ function QPrompt1_1({ data, order, isLast }) {
     content?.texts[0]?.length > 0
       ? content?.texts[0]
       : "";
+
+  const questionText =
+    data?.question?.texts[0] !== null &&
+    data?.question?.texts[0] !== undefined &&
+    data?.question?.texts[0]?.length > 0
+      ? data?.question?.texts[0]
+      : "";
+
   //   const [isLoading, setIsLoading] = useState(
   //     checkImage(content?.images[0])
   //       ? getCacheImage([content?.images[0]])
@@ -49,6 +57,8 @@ function QPrompt1_1({ data, order, isLast }) {
             }}
           />
         )}
+
+        <>{questionText}</>
       </div>
     </>
   );

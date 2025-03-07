@@ -1,5 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { connect, useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import Cookies from "universal-cookie";
+import { submitAnswerPractice } from "../../config/quiz";
+import {
+  getQuizInformations,
+  selectAnsweredQuestions,
+  setQuestionAnswered,
+  setQuestionsAnswered,
+  setQuestionState,
+} from "../../store/quizQuestionSlice";
 import ScorePopup from "./ScorePopup";
 
 const PracticeQuestionRight = ({
@@ -7,19 +17,42 @@ const PracticeQuestionRight = ({
   selectedIndex,
   handleQuestionChange,
   setIsLoadingShowSolution,
+  quizInformation,
 }) => {
+  const dispatch = useDispatch();
+  const cookie = new Cookies();
+  const token = cookie.get("signin_user");
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isPopupSubmitAllPractice, setIsPopupSubmitAllPractice] =
     useState(false);
 
+  const [isShowPopupCancel, setIsShowPopupCancel] = useState(false);
+
   const [isPopupCaculationScore, setIsPopupCaculationScore] = useState(false);
   const navigate = useNavigate();
+  var answeredQuestion = useSelector(selectAnsweredQuestions);
 
   const handleCloseQuestions = () => {
-    setIsPopupOpen(true);
+    if (!JSON.parse(localStorage.getItem("showSolutions"))) {
+      if (window.location.pathname === "/bai_kiem_tra_thuc_hanh") {
+        setIsShowPopupCancel(true);
+        // localStorage.removeItem("questionStateExams");
+      } else {
+        setIsPopupOpen(true);
+      }
+    } else {
+      localStorage.removeItem("newPracticeId");
+      localStorage.removeItem("questionStateExams");
+      navigate("/trang_hoc_chinh/luyen_tap_thuc_hanh");
+    }
   };
 
   const handleConfirmExit = () => {
+    if (window.location.pathname === "/bai_kiem_tra_thuc_hanh") {
+      localStorage.removeItem("newPracticeId");
+      localStorage.removeItem("questionStateExams");
+    }
+    setIsShowPopupCancel(false);
     setIsPopupOpen(false);
     navigate("/trang_hoc_chinh/luyen_tap_thuc_hanh");
   };
@@ -36,7 +69,55 @@ const PracticeQuestionRight = ({
     setIsPopupSubmitAllPractice(false);
   };
 
-  const handleSubmitAll = () => {
+  const handleSubmitAll = async () => {
+    if (window.location.pathname === "/bai_kiem_tra_thuc_hanh") {
+      const result = JSON.parse(localStorage.getItem("questionStateExams"));
+
+      if (result) {
+        if (result.questionState) {
+          dispatch(setQuestionState(result.questionState));
+        }
+
+        if (result.questionAnswered) {
+          dispatch(setQuestionAnswered(result.questionAnswered));
+        }
+
+        if (result.questionsAnswered) {
+          dispatch(setQuestionsAnswered(result.questionsAnswered));
+        }
+
+        answeredQuestion = result.questionsAnswered;
+      } else {
+        answeredQuestion = questions.map((question) => ({
+          questionId: question.questionId,
+          questionIndex: question.questionIndex,
+          answer: question.answer,
+        }));
+      }
+
+      var payload = {
+        submit: true,
+        questions: answeredQuestion,
+      };
+
+      try {
+        await submitAnswerPractice(
+          localStorage.getItem("newPracticeId"),
+          payload,
+          token
+        );
+
+        // Đợi submitAnswerPractice hoàn thành rồi mới gọi getQuizQuestions
+        dispatch(
+          getQuizInformations({
+            quizId: "67c31a285f0cb67075d0a72b",
+            token,
+          })
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    }
     setIsPopupSubmitAllPractice(false);
     setIsPopupCaculationScore(true);
   };
@@ -56,8 +137,46 @@ const PracticeQuestionRight = ({
 
   const userAnswers = JSON.parse(localStorage.getItem("userAnswers"));
 
+  useEffect(() => {
+    if (
+      JSON.parse(localStorage.getItem("showSolutions")) &&
+      window.location.pathname === "/bai_kiem_tra_thuc_hanh"
+    ) {
+      dispatch(
+        getQuizInformations({
+          quizId: "67c31a285f0cb67075d0a72b",
+          token,
+        })
+      );
+    }
+  }, []);
+
   return (
     <>
+      {isShowPopupCancel && (
+        <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm z-[1100] transition-opacity duration-300">
+          <div className="bg-white p-6 rounded-2xl shadow-2xl text-center w-120 animate-fadeIn">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">
+              Bạn sẽ bỏ lỡ trả lời những câu còn lại ?
+            </h2>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={showPopupSubmitAllPractice}
+                className="cursor-pointer px-5 py-2.5 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 active:bg-red-700 transition-all"
+              >
+                Nộp toàn bộ
+              </button>
+              <button
+                onClick={handleConfirmExit}
+                className="cursor-pointer px-5 py-2.5 bg-gray-300 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-400 active:bg-gray-500 transition-all"
+              >
+                Thoát và không làm câu còn lại
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {isPopupOpen && (
         <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm z-[1100] transition-opacity duration-300">
           <div className="bg-white p-6 rounded-2xl shadow-2xl text-center w-90 animate-fadeIn">
@@ -247,7 +366,11 @@ const PracticeQuestionRight = ({
               );
 
               const hasValidAnswer =
-                userAnswer && userAnswer?.userChoice?.length > 0;
+                userAnswer &&
+                (userAnswer?.answer?.length > 0 ||
+                  (userAnswer?.answer !== null &&
+                    userAnswer?.userChoice?.length > 0));
+
               return (
                 <button
                   key={index}
@@ -312,8 +435,10 @@ const PracticeQuestionRight = ({
           >
             🌱 Điểm luyện thi:{" "}
             <span className="text-2xl font-extrabold text-yellow-200">
-              {JSON.parse(localStorage.getItem("scorePractice") || 0)} /
-              {questions.length}
+              {window.location.pathname === "/bai_kiem_tra_thuc_hanh"
+                ? quizInformation?.correctAnswersLP
+                : JSON.parse(localStorage.getItem("scorePractice") || 0)}{" "}
+              /{questions.length}
             </span>
           </div>
         )}
@@ -334,4 +459,10 @@ const PracticeQuestionRight = ({
   );
 };
 
-export default PracticeQuestionRight;
+function mapStateToProps(state) {
+  return {
+    quizInformation: state.quiz.quizInformation,
+  };
+}
+
+export default connect(mapStateToProps)(PracticeQuestionRight);

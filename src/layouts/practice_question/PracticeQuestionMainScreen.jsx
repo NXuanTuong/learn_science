@@ -40,7 +40,7 @@ const PracticeQuestionMainScreen = ({ questions }) => {
         const initialAnswers = questions.map((question, index) => ({
           id: question._id,
           answer:
-            question.template?.question === "MultipleResponse" ? [] : null, // Mặc định chưa làm
+            question.template?.question === "MultipleResponse" ? [] : null,
           questionIndex: index,
           userChoice: null,
         }));
@@ -57,10 +57,14 @@ const PracticeQuestionMainScreen = ({ questions }) => {
   };
 
   useEffect(() => {
+    if (localStorage.getItem("showSolutions")) {
+      localStorage.removeItem("questionStateExams");
+    }
+
     setTimeout(() => {
       setIsLoadingShowSolution(false);
     }, 3000);
-  }, [isLoadingShowSolution]); // Lắng nghe thay đổi
+  }, [isLoadingShowSolution]);
 
   if (isLoading || isLoadingShowSolution) {
     return (

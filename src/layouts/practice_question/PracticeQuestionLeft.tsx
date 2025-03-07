@@ -37,6 +37,7 @@ const PracticeQuestionLeft = ({
             questionItem={question}
             question={question.question}
             selectedQuestion={selectedQuestion}
+            questionId={question.questionId}
             handleQuestionChange={handleQuestionChange}
             questions={questions}
           />
@@ -47,6 +48,7 @@ const PracticeQuestionLeft = ({
             questionItem={question}
             question={question.question}
             selectedQuestion={selectedQuestion}
+            questionId={question.questionId}
             handleQuestionChange={handleQuestionChange}
             questions={questions}
           />
@@ -58,6 +60,7 @@ const PracticeQuestionLeft = ({
             question={question.question}
             selectedQuestion={selectedQuestion}
             handleQuestionChange={handleQuestionChange}
+            questionId={question.questionId}
             questions={questions}
           />
         );
@@ -67,6 +70,7 @@ const PracticeQuestionLeft = ({
             questionItem={question}
             question={question.question}
             selectedQuestion={selectedQuestion}
+            questionId={question.questionId}
             handleQuestionChange={handleQuestionChange}
             questions={questions}
           />

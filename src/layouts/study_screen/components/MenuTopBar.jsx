@@ -14,13 +14,18 @@ const MenuTopBar = () => {
     {
       title: "Khám phá khoa học",
       icon: <i className="fa-solid fa-microscope"></i>,
-      path: "/trang_hoc_chinh",
+      path: "",
     },
     {
       title: "Luyện tập thực hành",
       icon: <i className="fa-solid fa-book"></i>,
       path: "luyen_tap_thuc_hanh",
     },
+    // {
+    //   title: "Về đích",
+    //   icon: <i className="fa-solid fa-flag-checkered"></i>,
+    //   path: "ve_dich",
+    // },
   ]);
 
   const [currentPage, setCurrentPage] = useState(0);
@@ -31,11 +36,8 @@ const MenuTopBar = () => {
   };
 
   const handleLogout = () => {
-    const listCookies = cookies.getAll();
     localStorage.clear();
-    Object.keys(listCookies).forEach((cookie) => {
-      cookies.remove(cookie);
-    });
+    cookies.remove("signin_user");
     navigate("/");
     toast.success("Đăng xuất thành công");
   };
@@ -52,77 +54,70 @@ const MenuTopBar = () => {
 
   return (
     <>
-      <div className="flex flex-row justify-between relative rounded-2xl border-2 border-[#004a37] items-center px-[2.5rem] bg-[#fafbfc] py-[0.5rem] w-11/12 max-w-11/12 min-h-[10rem]">
-        <div className=" flex flex-row justify-between items-center gap-3">
+      <div className=" flex flex-row justify-between items-center rounded-3xl border-2 border-transparent px-10 bg-[#fafbfc] py-4 w-11/12 max-w-[80rem] min-h-[10rem] shadow-2xl transition-all duration-300 hover:scale-105 hover:shadow-3xl backdrop-blur-md bg-opacity-80 border-[3px] border-transparent bg-clip-padding bg-gradient-to-r from-[#004a37] to-[#34d399] p-[2px]">
+        {/* Logo */}
+        <div className="flex flex-row items-center gap-4">
           <div className="rounded-full w-4 h-4 bg-[#458665]"></div>
           <div className="rounded-full w-4 h-4 bg-[#ff6379]"></div>
-          {/* <p className="text-4xl text-[#004a37] font-['Exo_2'] font-medium">
-            Sci-Learing
-          </p> */}
           <img
-            className="object-cover h-[8rem]"
+            className="object-cover h-[7rem]"
             src="/images/logo.png"
-            alt=""
+            alt="Logo"
           />
         </div>
 
-        {/* <img className="w-[8rem] h-[8rem]" src="/images/logo.png" alt="" /> */}
+        {/* Menu */}
+        <div className="flex flex-wrap justify-center flex-row items-center gap-6">
+          {listMenu.map((item, index) => (
+            <Link key={index} to={item.path}>
+              <span
+                onClick={() => handleChangePage(index)}
+                className={`p-3 px-5 h-12 cursor-pointer rounded-xl flex flex-row justify-center items-center gap-3 border transition-all duration-300 font-semibold
+                ${
+                  currentPage === index
+                    ? "bg-[#004a37] text-white shadow-lg scale-105"
+                    : "bg-[#d8e1f4] text-[#004a37] hover:bg-[#b5c6e0] hover:shadow-md hover:scale-105"
+                }`}
+              >
+                {item.icon}
+                <p className="text-sm uppercase">{item.title}</p>
+              </span>
+            </Link>
+          ))}
 
-        <div className="flex flex-wrap justify-center flex-row items-center gap-[1rem]">
-          {listMenu.map((item, index) => {
-            return (
-              <Link key={index} to={item.path}>
-                <span
-                  onClick={() => handleChangePage(index)}
-                  className={
-                    currentPage == index
-                      ? "p-[1rem] w-[15rem] h-[3rem] cursor-pointer rounded-xl bg-[#fafbfc] flex flex-row justify-center items-center gap-[0.75rem] border border-[#004a37] rounded-xl shadow-[2px_4px_0_0_#004a37]"
-                      : "p-[1rem] w-[15rem] h-[3rem] cursor-pointer rounded-xl bg-[#d8e1f4] flex flex-row justify-center items-center gap-[0.75rem]"
-                  }
-                >
-                  {item.icon}
-                  <p className="text-[0.95rem] font-bold uppercase">
-                    {item.title}
-                  </p>
-                </span>
-              </Link>
-            );
-          })}
-
-          <nav className="w-[15rem] h-[3rem] relative bg-[#d8e1f4] rounded-2xl">
+          {/* Dropdown */}
+          <nav className="relative h-12 w-[15rem] bg-[#d8e1f4] rounded-2xl shadow-md transition-all duration-300">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="w-full h-[3rem] p-[1rem] bg-[#d8e1f4] rounded-2xl text-xs uppercase cursor-pointer flex justify-between items-center "
+              className="w-full h-12 p-4 bg-[#d8e1f4] rounded-2xl text-sm uppercase cursor-pointer flex justify-between items-center font-semibold hover:bg-[#b5c6e0] transition-all duration-300"
             >
-              <p className="font-bold">
+              <p>
                 Xin chào,{" "}
-                <span className="text-base text-[#004a37]">
+                <span className="text-base text-[#004a37] font-bold">
                   {localStorage.getItem("userName")}
                 </span>
               </p>
-              {isOpen ? (
-                <i className="fa-solid fa-arrow-up"></i>
-              ) : (
-                <i className="fa-solid fa-arrow-down"></i>
-              )}
+              <i
+                className={`fa-solid ${
+                  isOpen ? "fa-chevron-up" : "fa-chevron-down"
+                }`}
+              ></i>
             </button>
 
-            {/* Dropdown sử dụng absolute để không thay đổi chiều cao của div cha */}
             <ul
-              className={`absolute flex cursor-pointer flex-col items-center p-[0.5rem] gap-[0.75rem] bg-[#fafbfc] border-[1.5px] border-[#004a37] rounded-xl shadow-[2px_4px_0_0_#004a37] w-[13rem] left-0 w-full mt-[1rem] text-center transition-all duration-300 ${
-                isOpen ? "opacity-100 max-h-40" : "opacity-0 max-h-0"
+              className={`absolute left-0 w-full mt-3 bg-[#fafbfc] border-2 border-[#004a37] rounded-xl shadow-lg transition-all duration-300 overflow-hidden ${
+                isOpen
+                  ? "opacity-100 max-h-40 translate-y-0"
+                  : "opacity-0 max-h-0 -translate-y-2"
               }`}
             >
-              {["Đăng xuất"].map((item, index) => (
-                <li
-                  onClick={handleLogout}
-                  key={index}
-                  className="p-[1rem] w-[13.5rem] h-[3rem] rounded-xl bg-[#d8e1f4] flex flex-row justify-center items-center gap-[0.75rem]"
-                >
-                  <i className="fa-solid fa-right-from-bracket"></i>
-                  <p className="font-bold text-base uppercase">{item}</p>
-                </li>
-              ))}
+              <li
+                onClick={handleLogout}
+                className="p-4 flex flex-row justify-center items-center gap-3 bg-[#d8e1f4] hover:bg-[#b5c6e0] rounded-xl transition-all duration-300 cursor-pointer"
+              >
+                <i className="fa-solid fa-sign-out-alt"></i>
+                <p className="font-semibold text-sm uppercase">Đăng xuất</p>
+              </li>
             </ul>
           </nav>
         </div>

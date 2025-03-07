@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { connect, useDispatch } from "react-redux";
 
 const ScorePopup = ({
   isPopupCaculationScore,
@@ -7,6 +7,7 @@ const ScorePopup = ({
   setIsPopupCaculationScore,
   setIsLoadingShowSolution,
   handleQuestionChange,
+  quizInformation,
 }) => {
   const [isLoadingScore, setIsLoadingScore] = useState(true);
   const [correctCount, setCorrectCount] = useState(0);
@@ -78,7 +79,11 @@ const ScorePopup = ({
                 <div
                   className="h-4 bg-gradient-to-r from-orange-400 to-yellow-500 transition-all rounded-full"
                   style={{
-                    width: `${(correctCount / questions.length) * 100}%`,
+                    width: `${
+                      (window.location.pathname === "/bai_kiem_tra_thuc_hanh"
+                        ? quizInformation.correctAnswersLP
+                        : correctCount / questions.length) * 100
+                    }%`,
                   }}
                 ></div>
               </div>
@@ -86,7 +91,9 @@ const ScorePopup = ({
               {/* Số câu đúng */}
               <p className="text-lg mt-3 text-gray-700 font-medium">
                 <span className="text-3xl font-extrabold text-green-600">
-                  {correctCount}
+                  {window.location.pathname === "/bai_kiem_tra_thuc_hanh"
+                    ? quizInformation.correctAnswersLP
+                    : correctCount}
                 </span>{" "}
                 /{" "}
                 <span className="text-xl font-semibold">
@@ -124,4 +131,10 @@ const ScorePopup = ({
   );
 };
 
-export default ScorePopup;
+function mapStateToProps(state) {
+  return {
+    quizInformation: state.quiz.quizInformation,
+  };
+}
+
+export default connect(mapStateToProps)(ScorePopup);

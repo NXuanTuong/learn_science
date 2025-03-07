@@ -44,13 +44,20 @@ const FlyDrag = ({
 
       dispatch(
         setUserAnswer({
-          id: questionItem._id,
+          id:
+            window.location.pathname === "/bai_kiem_tra_thuc_hanh"
+              ? questionItem.questionId
+              : questionItem._id,
           answer: updatedIndices,
           questionIndex: selectedQuestion,
           template: "MultipleResponse",
           userChoice: updatedIndices,
         })
       );
+
+      if (window.location.pathname === "/bai_kiem_tra_thuc_hanh") {
+        saveAnswer(updatedIndices, questionItem.questionId);
+      }
 
       return updatedIndices;
     });
@@ -65,7 +72,10 @@ const FlyDrag = ({
 
       dispatch(
         setUserAnswer({
-          id: questionItem._id,
+          id:
+            window.location.pathname === "/bai_kiem_tra_thuc_hanh"
+              ? questionItem.questionId
+              : questionItem._id,
           answer: finalAnswer,
           questionIndex: selectedQuestion,
           template: "MultipleResponse",
@@ -73,8 +83,37 @@ const FlyDrag = ({
         })
       );
 
+      if (window.location.pathname === "/bai_kiem_tra_thuc_hanh") {
+        saveAnswer(finalAnswer, questionItem.questionId);
+      }
+
       return finalAnswer ?? [];
     });
+  };
+
+  const saveAnswer = (answer, questionId) => {
+    const submit = {
+      submit: false,
+      questions: [
+        {
+          answer: answer,
+          questionId: questionId,
+          questionIndex: selectedQuestion,
+        },
+      ],
+    };
+
+    const questionsAnswered = [
+      {
+        answer: answer,
+        questionId: questionId,
+        questionIndex: selectedQuestion,
+      },
+    ];
+
+    const value = { questionsAnswered, submit };
+
+    localStorage.setItem("questionStateExams", JSON.stringify(value));
   };
 
   const showSolutions = JSON.parse(
