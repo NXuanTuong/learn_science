@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { connect, useDispatch } from "react-redux";
 import Cookies from "universal-cookie";
 import { getLessonQuestion } from "../../store/listQuestionSlice";
 import PracticeQuestionLeft from "./PracticeQuestionLeft";
 import PracticeQuestionRight from "./PracticeQuestionRight";
+import { useSearchParams } from "react-router-dom";
 
 const PracticeQuestionMainScreen = ({ questions }) => {
   const dispatch = useDispatch();
@@ -15,14 +16,18 @@ const PracticeQuestionMainScreen = ({ questions }) => {
     localStorage.getItem("showSolutions") === "true"
   );
   const [selectedQuestion, setSelectedQuestion] = useState(0);
+  const [searchParams] = useSearchParams();
+
 
   useEffect(() => {
     if (questions === null || questions === undefined) {
       setIsLoading(true);
     }
+    let id = searchParams.get("id");
+    let lessonId2="67cbccf76cd5f0e7bbc47987"
     dispatch(
       getLessonQuestion({
-        lessonId: "67b8718497e6b51bc91adb8e",
+        lessonId: id ?? lessonId2,
         token,
       })
     ).finally(() => {

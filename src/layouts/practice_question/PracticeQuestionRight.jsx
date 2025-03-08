@@ -110,7 +110,7 @@ const PracticeQuestionRight = ({
         // Đợi submitAnswerPractice hoàn thành rồi mới gọi getQuizQuestions
         dispatch(
           getQuizInformations({
-            quizId: "67c31a285f0cb67075d0a72b",
+            quizId: "67cbd500a8a69a4dd320b14b",
             token,
           })
         );
@@ -144,7 +144,7 @@ const PracticeQuestionRight = ({
     ) {
       dispatch(
         getQuizInformations({
-          quizId: "67c31a285f0cb67075d0a72b",
+          quizId: "67cbd500a8a69a4dd320b14b",
           token,
         })
       );
@@ -357,7 +357,7 @@ const PracticeQuestionRight = ({
             {localStorage.getItem("practiceName")}
           </p>
 
-          <div className="flex gap-4 justify-center items-center">
+          <div className="flex gap-4 flex-wrap justify-center items-center">
             {questions.map((item, index) => {
               const storedAnswers =
                 JSON.parse(localStorage.getItem("userAnswers")) || [];

@@ -157,7 +157,7 @@ const MultipleResponseQuestion = ({
                 key={index}
                 onClick={() => handleSelect(index)}
                 disabled={JSON.parse(showSolutions)}
-                className={`w-[9rem] h-[3.5rem] cursor-pointer p-3 text-lg font-bold rounded-full transition-all duration-300 ease-in-out
+                className={`w-[9rem] h-auto cursor-pointer p-3 text-lg font-bold rounded-lg transition-all duration-300 ease-in-out
               ${
                 selectedIndices.includes(index) // Kiểm tra nếu index nằm trong danh sách lựa chọn
                   ? JSON.parse(showSolutions)
@@ -202,7 +202,7 @@ const MultipleResponseQuestion = ({
                   <button
                     key={index}
                     disabled={JSON.parse(showSolutions)}
-                    className={`w-[9rem] h-[3.5rem] cursor-pointer p-3 text-lg font-bold rounded-full relative transition-all duration-300 ease-in-out
+                    className={`w-[9rem] h-auto cursor-pointer p-3 text-lg font-bold rounded-lg relative transition-all duration-300 ease-in-out
                       bg-green-500 text-white shadow-[0px_4px_0px_#1B5E20] scale-105 border border-white
                       hover:from-green-400 hover:to-green-600 hover:shadow-[1px_1px_0px_#1B5E20]
                       active:shadow-none active:translate-y-[2px] active:translate-x-[2px]`}
@@ -217,7 +217,7 @@ const MultipleResponseQuestion = ({
       </div>
 
       <div
-        className={`w-full max-w-[60rem] absolute left-1/2 bottom-[-5rem] transform -translate-x-1/2 flex flex-row justify-between items-center h-[3.5rem]`}
+        className={`w-full max-w-[60rem] absolute left-1/2 bottom-[-5rem] transform -translate-x-1/2 flex flex-row justify-between items-center h-auto`}
       >
         <button
           onClick={() => handleQuestionChange(selectedQuestion - 1)}

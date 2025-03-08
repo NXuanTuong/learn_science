@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setUserAnswer } from "../store/listQuestionSlice";
 import { QuestionTemplateProps } from "../interface/question";
@@ -32,6 +32,9 @@ const FlyDrag = ({
   });
 
   const handleSelect = (index: number) => {
+    if (selectedIndices.length == questionSolutions.length && selectedIndices.every((item) => item !== -1)) {
+      return 
+    }
     setSelectedIndices((prev) => {
       let updatedIndices = [...prev];
 
@@ -127,11 +130,11 @@ const FlyDrag = ({
     <>
       <div className="flex flex-col gap-8 justify-center items-center">
         {questionTexts && questionTexts?.length > 0 && (
-          <div className="flex flex-row gap-6 p-4 bg-gradient-to-r from-green-200 to-blue-200 rounded-xl shadow-lg">
+          <div className="flex flex-row flex-wrap gap-4 p-4 bg-gradient-to-r from-green-200 to-blue-200 rounded-xl shadow-lg">
             {questionTexts.map((text: any, index: any) => (
-              <div
+              <Fragment
                 key={index}
-                className="text-center flex flex-row items-center gap-4"
+                // className=" flex flex-row  gap-4"
               >
                 {/* Câu hỏi */}
                 <p className="text-xl font-semibold text-green-900">{text}</p>
@@ -139,7 +142,7 @@ const FlyDrag = ({
                 {index < questionTexts.length - 1 && (
                   <>
                     {selectedIndices[index] !== undefined ? (
-                      <div className="flex flex-col items-center">
+                      <div className="flex flex-col ">
                         {questionChoices[selectedIndices[index]] !==
                           undefined && (
                           <div
@@ -169,7 +172,7 @@ const FlyDrag = ({
                     )}
                   </>
                 )}
-              </div>
+              </Fragment>
             ))}
           </div>
         )}
@@ -198,7 +201,7 @@ const FlyDrag = ({
                             -1
                           ))
                       }
-                      className={`w-[9rem] h-[3.5rem] cursor-pointer p-3 text-lg font-bold rounded-full transition-all duration-300 ease-in-out
+                      className={`w-[9rem] h-auto cursor-pointer p-3 text-lg font-bold rounded-lg transition-all duration-300 ease-in-out
                       ${
                         selectedIndices.includes(index) // Kiểm tra nếu index nằm trong danh sách lựa chọn
                           ? JSON.parse(showSolutions)
@@ -277,7 +280,7 @@ const FlyDrag = ({
       </div>
 
       <div
-        className={`w-full max-w-[60rem] absolute left-1/2 bottom-[-5rem] transform -translate-x-1/2 flex flex-row justify-between items-center h-[3.5rem]`}
+        className={`w-full max-w-[60rem] absolute left-1/2 bottom-[-5rem] transform -translate-x-1/2 flex flex-row justify-between items-center h-auto`}
       >
         <button
           onClick={() => handleQuestionChange(selectedQuestion - 1)}

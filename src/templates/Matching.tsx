@@ -483,7 +483,7 @@ const Matching = ({
       </div>
 
       <div
-        className={`w-full max-w-[60rem] absolute left-1/2 bottom-[-5rem] transform -translate-x-1/2 flex flex-row justify-between items-center h-[3.5rem]`}
+        className={`w-full max-w-[60rem] absolute left-1/2 bottom-[-5rem] transform -translate-x-1/2 flex flex-row justify-between items-center h-auto`}
       >
         <button
           onClick={() => handleQuestionChange(selectedQuestion - 1)}
