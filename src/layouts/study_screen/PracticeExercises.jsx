@@ -23,6 +23,7 @@ const PracticeExercises = ({ quizInformation, quiz }) => {
         "practiceName",
         "Bài Tập về Khoa Học, Thực Vật, Động Vật..."
       );
+      localStorage.removeItem("userAnswers");
       navigate("/cau_hoi_luyen_tap?id=" + id);
     } catch (error) {
       console.log("Lỗi API:", error);

@@ -195,9 +195,9 @@ const FlyDrag = ({
                       onClick={() => handleSelect(index)}
                       disabled={
                         JSON.parse(showSolutions) ||
-                        (parsedAnswers[selectedQuestion].userChoice?.length ===
+                        (parsedAnswers[selectedQuestion]?.useChoice?.length ===
                           questionSolutions.length &&
-                          !parsedAnswers[selectedQuestion].userChoice?.includes(
+                          !parsedAnswers[selectedQuestion]?.useChoice?.includes(
                             -1
                           ))
                       }
