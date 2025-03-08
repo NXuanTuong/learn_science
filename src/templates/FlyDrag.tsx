@@ -137,7 +137,7 @@ const FlyDrag = ({
                 // className=" flex flex-row  gap-4"
               >
                 {/* Câu hỏi */}
-                <p className="text-xl font-semibold text-green-900">{text}</p>
+                <span className="text-xl font-semibold text-green-900" style={{ whiteSpace: "nowrap" }}>{text}</span>
 
                 {index < questionTexts.length - 1 && (
                   <>
@@ -153,7 +153,7 @@ const FlyDrag = ({
                             }}
                             className={`${
                               showSolutions
-                                ? questionSolutions[index] ===
+                                ? questionSolutions[index] - 1 ===
                                   selectedIndices[index]
                                   ? "bg-green-600" // Đúng khi showSolutions bật
                                   : "bg-red-600" // Sai khi showSolutions bật
@@ -240,37 +240,37 @@ const FlyDrag = ({
               ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨
             </p>
 
-            <div className="w-full max-w-[40rem] flex flex-col justify-center items-center bg-white p-4 rounded-lg shadow-md border border-gray-300">
+            <div className="w-full  flex flex-col justify-center items-center bg-white p-4 rounded-lg shadow-md border border-gray-300">
               <p className="text-lg font-bold text-gray-800 mb-2">
                 🎯 Đáp án đúng:
               </p>
               {questionTexts && questionTexts?.length > 0 && (
-                <div className="flex flex-row gap-6 p-4 bg-gradient-to-r from-green-200 to-blue-200 rounded-xl shadow-lg">
+                <div className="flex flex-row flex-wrap gap-1 items-end p-4 bg-gradient-to-r from-green-200 to-blue-200 rounded-xl shadow-lg">
                   {questionTexts.map((text: any, index: any) => (
-                    <div
+                    <Fragment
                       key={index}
-                      className="text-center flex flex-row items-center gap-4"
+                      // className="text-center flex flex-row items-center gap-4"
                     >
                       {/* Câu hỏi */}
-                      <p className="text-xl font-semibold text-green-900">
+                      <span className="text-xl font-semibold text-green-900" style={{whiteSpace:"nowrap"}}>
                         {text}
-                      </p>
+                      </span>
 
                       {index < questionTexts.length - 1 && (
                         <>
-                          <div className="flex flex-col items-center">
+                          <span className="flex flex-col items-center">
                             {/* Lựa chọn được chọn */}
 
                             <div className="bg-green-600 text-white px-4 py-2 rounded-xl shadow-lg transition-transform duration-300 ease-in-out hover:scale-110 cursor-pointer flex items-center gap-2">
-                              {questionChoices[questionSolutions[index]]}
+                              {questionChoices[questionSolutions[index] - 1]}
                             </div>
 
                             {/* Hiệu ứng đường kẻ */}
                             <div className="w-16 h-1 bg-green-700 mt-2 rounded-full transition-all duration-300"></div>
-                          </div>
+                          </span>
                         </>
                       )}
-                    </div>
+                    </Fragment>
                   ))}
                 </div>
               )}
