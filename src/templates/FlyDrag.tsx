@@ -32,8 +32,11 @@ const FlyDrag = ({
   });
 
   const handleSelect = (index: number) => {
-    if (selectedIndices.length == questionSolutions.length && selectedIndices.every((item) => item !== -1)) {
-      return 
+    if (
+      selectedIndices.length == questionSolutions.length &&
+      selectedIndices.every((item) => item !== -1)
+    ) {
+      return;
     }
     setSelectedIndices((prev) => {
       let updatedIndices = [...prev];
@@ -128,7 +131,7 @@ const FlyDrag = ({
 
   return (
     <>
-      <div className="flex flex-col gap-8 justify-center items-center">
+      <div className="flex flex-col gap-8 justify-center items-center w-full">
         {questionTexts && questionTexts?.length > 0 && (
           <div className="flex flex-row flex-wrap gap-4 p-4 bg-gradient-to-r from-green-200 to-blue-200 rounded-xl shadow-lg">
             {questionTexts.map((text: any, index: any) => (
@@ -137,12 +140,14 @@ const FlyDrag = ({
                 // className=" flex flex-row  gap-4"
               >
                 {/* Câu hỏi */}
-                <span className="text-xl font-semibold text-green-900" style={{ whiteSpace: "nowrap" }}>{text}</span>
+                <span className="text-xl font-semibold text-green-900">
+                  {text}
+                </span>
 
                 {index < questionTexts.length - 1 && (
                   <>
                     {selectedIndices[index] !== undefined ? (
-                      <div className="flex flex-col ">
+                      <div className="flex flex-col">
                         {questionChoices[selectedIndices[index]] !==
                           undefined && (
                           <div
@@ -155,10 +160,10 @@ const FlyDrag = ({
                               showSolutions
                                 ? questionSolutions[index] - 1 ===
                                   selectedIndices[index]
-                                  ? "bg-green-600" // Đúng khi showSolutions bật
-                                  : "bg-red-600" // Sai khi showSolutions bật
-                                : "bg-green-600" // Mặc định xanh khi showSolutions tắt
-                            } text-white px-4 py-2 rounded-xl shadow-lg transition-transform duration-300 ease-in-out hover:scale-110 cursor-pointer flex items-center gap-2`}
+                                  ? "bg-green-600"
+                                  : "bg-red-600"
+                                : "bg-green-600"
+                            } text-white px-4 py-2 rounded-xl shadow-lg transition-transform duration-300 ease-in-out hover:scale-110 cursor-pointer  items-center gap-2 text-center`}
                           >
                             {questionChoices[selectedIndices[index]]}
                           </div>
@@ -176,7 +181,9 @@ const FlyDrag = ({
             ))}
           </div>
         )}
-        <div className={`gap-4 grid grid-cols-4 `}>
+        <div
+          className={`gap-4 flex flex-wrap justify-center items-center w-full `}
+        >
           {questionChoices.map((choice: any, index: any) => {
             const isSelected = selectedIndices?.includes(index);
 
@@ -252,7 +259,7 @@ const FlyDrag = ({
                       // className="text-center flex flex-row items-center gap-4"
                     >
                       {/* Câu hỏi */}
-                      <span className="text-xl font-semibold text-green-900" style={{whiteSpace:"nowrap"}}>
+                      <span className="text-xl font-semibold text-green-900">
                         {text}
                       </span>
 

@@ -69,7 +69,7 @@ const PracticeExercises = ({ quizInformation, quiz }) => {
       <div className="flex flex-row justify-center items-center gap-6 w-full relative">
         {!showListUnit && (
           <>
-            <div className="relative w-[20rem] h-[24rem] cursor-pointer rounded-3xl border border-[#007f5f] bg-[#eaf7e3] shadow-xl transition-all duration-300 hover:shadow-2xl hover:ring-2 hover:ring-[#007f5f] hover:-translate-y-2">
+            <div className="relative w-[20rem] h-[22rem] cursor-pointer rounded-3xl border border-[#007f5f] bg-[#eaf7e3] shadow-xl transition-all duration-300 hover:shadow-2xl hover:ring-2 hover:ring-[#007f5f] hover:-translate-y-2">
               <div className="flex flex-col items-center gap-5 w-full h-full ">
                 <div className="w-full h-[12rem] overflow-hidden rounded-t-3xl border border-[#007f5f]">
                   <img
@@ -80,7 +80,7 @@ const PracticeExercises = ({ quizInformation, quiz }) => {
                 </div>
 
                 <p className="font-bold text-2xl text-[#007f5f] text-center tracking-wide">
-                  🌿 Thực Vật và Động Vật I
+                  Thực Vật và Động Vật I
                 </p>
 
                 <button
@@ -158,11 +158,13 @@ const PracticeExercises = ({ quizInformation, quiz }) => {
                 </div>
 
                 <p className="font-bold text-2xl text-[#007f5f] text-center tracking-wide">
-                Thực vật cần gì để sống 
+                  Thực vật cần gì để sống
                 </p>
 
                 <button
-                  onClick={()=>handleGetListQuestions("67cbbe5e51bc86aaba6fa44a")}
+                  onClick={() =>
+                    handleGetListQuestions("67cbbe5e51bc86aaba6fa44a")
+                  }
                   className="cursor-pointer z-10 w-[10rem] h-[3rem] rounded-full bg-[#007f5f] text-white uppercase text-lg font-bold leading-none shadow-lg shadow-[#004a37] transition-all duration-300 ease-in-out transform hover:scale-100 hover:bg-[#005a40] hover:shadow-xl hover:shadow-[#005a40] hover:-translate-y-1"
                 >
                   Làm Ngay
@@ -196,11 +198,13 @@ const PracticeExercises = ({ quizInformation, quiz }) => {
                 </div>
 
                 <p className="font-bold text-2xl text-[#007f5f] text-center tracking-wide">
-                Chăm sóc cây trồng, vật nuôi
+                  Chăm sóc cây trồng, vật nuôi
                 </p>
 
                 <button
-                   onClick={()=>handleGetListQuestions("67cbccf76cd5f0e7bbc47987")}
+                  onClick={() =>
+                    handleGetListQuestions("67cbccf76cd5f0e7bbc47987")
+                  }
                   className="cursor-pointer z-10 w-[10rem] h-[3rem] rounded-full bg-[#007f5f] text-white uppercase text-lg font-bold leading-none shadow-lg shadow-[#004a37] transition-all duration-300 ease-in-out transform hover:scale-100 hover:bg-[#005a40] hover:shadow-xl hover:shadow-[#005a40] hover:-translate-y-1"
                 >
                   Làm Ngay
@@ -276,9 +280,13 @@ const PracticeExercises = ({ quizInformation, quiz }) => {
                   Kết quả lần trước
                 </p>
                 <span className="bg-white text-[#007f5f] font-bold px-5 py-2 rounded-lg shadow-md text-lg">
-                  {!localStorage.getItem("scorePractice")
-                    ? "-"
-                    : `${quizInformation?.correctAnswersLP} / ${quizInformation?.numberQuestionsLP}`}
+                  {quizInformation?.correctAnswersLP === null
+                    ? 0
+                    : quizInformation?.correctAnswersLP}
+                  /
+                  {quizInformation?.numberQuestionsLP === null
+                    ? 0
+                    : quizInformation?.numberQuestionsLP}
                 </span>
               </div>
             </div>

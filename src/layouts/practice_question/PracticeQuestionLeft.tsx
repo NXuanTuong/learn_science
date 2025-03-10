@@ -88,8 +88,8 @@ const PracticeQuestionLeft = ({
           </div>
 
           <div className="border-x border-[#f4bcb6]/50 drop-shadow-lg rounded-b-xl bg-gradient-to-b from-[#fce0dd] to-[#f4bcb6] ">
-            <div className="px-6 py-8">
-              <div className="flex flex-row justify-center items-center">
+            <div className="px-6 py-8 w-full">
+              <div className="flex flex-wrap flex-row justify-center items-center w-full">
                 <TemplateQuestion />
               </div>
             </div>

@@ -142,7 +142,7 @@ const PracticeQuizMainScreen = ({ quizInformation, questions }) => {
           localStorage.getItem("showSolutions")
             ? "bg-[url('/public/images/background_solu_quiz.png')]"
             : "bg-[url('/public/images/background_quiz.png')]"
-        } w-full flex flex-row justify-center items-center`}
+        } w-full flex flex-row`}
       >
         {questions && (
           <div className="min-h-screen px-10 pt-20 pb-40 mr-[18.75rem] w-[calc(100%-18.75rem)] flex flex-col justify-center items-center">

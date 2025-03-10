@@ -17,6 +17,7 @@ const MultipleResponseQuestion = ({
   const dispatch = useDispatch();
 
   const getGridCols = () => {
+    if (questionChoices.length >= 6) return "grid-cols-4"; // 3 trên, 2 dưới
     if (questionChoices.length === 5) return "grid-cols-3"; // 3 trên, 2 dưới
     if (questionChoices.length === 4) return "grid-cols-2"; // 2 trên, 2 dưới
     return "grid-cols-3"; // 3 trong một hàng
@@ -193,24 +194,26 @@ const MultipleResponseQuestion = ({
               ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨
             </p>
 
-            <div className="w-full max-w-[40rem] flex flex-col justify-center items-center bg-white p-4 rounded-lg shadow-md border border-gray-300">
+            <div className="w-full flex flex-col justify-center items-center bg-white p-4 rounded-lg shadow-md border border-gray-300">
               <p className="text-lg font-bold text-gray-800 mb-2">
                 🎯 Đáp án đúng:
               </p>
-              {questionChoices.map((choice, index) =>
-                question.solutions[index] ? ( // Chỉ hiển thị nếu đúng (true)
-                  <button
-                    key={index}
-                    disabled={JSON.parse(showSolutions)}
-                    className={`w-[9rem] h-auto cursor-pointer p-3 text-lg font-bold rounded-lg relative transition-all duration-300 ease-in-out
+              <div className="flex flex-row gap-5">
+                {questionChoices.map((choice, index) =>
+                  question.solutions[index] ? ( // Chỉ hiển thị nếu đúng (true)
+                    <button
+                      key={index}
+                      disabled={JSON.parse(showSolutions)}
+                      className={`w-[9rem] h-auto cursor-pointer p-3 text-lg font-bold rounded-lg relative transition-all duration-300 ease-in-out
                       bg-green-500 text-white shadow-[0px_4px_0px_#1B5E20] scale-105 border border-white
                       hover:from-green-400 hover:to-green-600 hover:shadow-[1px_1px_0px_#1B5E20]
                       active:shadow-none active:translate-y-[2px] active:translate-x-[2px]`}
-                  >
-                    {choice}
-                  </button>
-                ) : null
-              )}
+                    >
+                      {choice}
+                    </button>
+                  ) : null
+                )}
+              </div>
             </div>
           </div>
         )}

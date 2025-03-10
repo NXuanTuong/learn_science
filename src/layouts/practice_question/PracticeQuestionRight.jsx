@@ -220,7 +220,7 @@ const PracticeQuestionRight = ({
               {" "}
               <div className="flex flex-row justify-center items-center gap-20">
                 {" "}
-                <div className="flex flex-col gap-4 justify-center items-center w-[25.5rem]">
+                <div className="flex flex-col gap-4 justify-center items-center w-[45rem]">
                   <div className="flex flex-row gap-2 justify-center items-center">
                     <div className="flex flex-row justify-center items-center gap-2">
                       <span className="bg-gray-200 w-3 h-3 border-white shadow-[4px_4px_10px_rgba(0,0,0,0.2)]"></span>
@@ -231,7 +231,7 @@ const PracticeQuestionRight = ({
                       <p className="text-xs">Đã làm</p>
                     </div>
                   </div>
-                  <div className="flex gap-4">
+                  <div className="flex gap-4 flex-wrap justify-center items-center">
                     {questions.map((item, index) => {
                       const storedAnswers =
                         JSON.parse(localStorage.getItem("userAnswers")) || [];
@@ -340,7 +340,7 @@ const PracticeQuestionRight = ({
         />
       )}
 
-      <div className="fixed right-0 flex flex-col w-75 h-screen top-[150px] z-[1000]">
+      <div className="fixed right-0 flex flex-col w-75 h-screen justify-center items-center z-[1000]">
         <div className="flex flex-col p-[2.5rem_1.5rem_1.5rem] rounded-[2.5rem_2.5rem_1.5rem_1.5rem] border border-[1.5px] border-[#0A2A66] shadow-[0.3rem_0.3rem_0rem_#1B5E20] w-64 gap-[1rem] relative justify-between bg-[#fafbfc]">
           <div
             onClick={handleCloseQuestions}
@@ -375,19 +375,21 @@ const PracticeQuestionRight = ({
                 <button
                   key={index}
                   onClick={() => handleQuestionChange(index)}
-                  className={`px-4 h-[2.7rem] cursor-pointer border-2 font-semibold rounded-xl transition-all duration-300
-                  ${
-                    showSolutions
-                      ? questions[index].question.solutions?.toString() ===
-                        userAnswers[index].userChoice?.toString()
-                        ? "bg-gradient-to-r from-green-400 to-green-600 text-white border-green-700 shadow-[0_4px_15px_rgba(34,197,94,0.5)] hover:shadow-[0_6px_20px_rgba(34,197,94,0.7)] ring-2 ring-green-300 drop-shadow-xl scale-105"
-                        : "bg-gradient-to-r from-red-400 to-red-600 text-white border-red-700 shadow-[0_4px_15px_rgba(239,68,68,0.5)] hover:shadow-[0_6px_20px_rgba(239,68,68,0.7)] ring-2 ring-red-300 drop-shadow-xl scale-105"
-                      : hasValidAnswer
-                      ? "bg-gradient-to-r from-yellow-400 to-yellow-500 text-white border-yellow-600 shadow-[0_4px_15px_rgba(234,179,8,0.5)] hover:shadow-[0_6px_20px_rgba(234,179,8,0.7)] ring-2 ring-yellow-300 drop-shadow-xl scale-105"
-                      : selectedIndex === index
-                      ? "bg-green-500 text-white border-green-700 shadow-[0_4px_15px_rgba(34,197,94,0.5)] hover:shadow-[0_6px_20px_rgba(34,197,94,0.7)] ring-2 ring-green-300 drop-shadow-xl scale-105"
-                      : "bg-gray-200 text-gray-700 border-white shadow-[4px_4px_10px_rgba(0,0,0,0.2)] hover:shadow-[6px_6px_12px_rgba(0,0,0,0.3)] active:shadow-[2px_2px_6px_rgba(0,0,0,0.3)]"
-                  }`}
+                  className={`px-4 h-[2.7rem] min-w-[3.2rem] cursor-pointer border-2 font-semibold rounded-xl transition-all duration-300
+    ${
+      showSolutions
+        ? questions[index].question.solutions?.toString() ===
+          userAnswers[index].userChoice?.toString()
+          ? "bg-gradient-to-r from-green-400 to-green-600 text-white border-green-700 shadow-[0_4px_15px_rgba(34,197,94,0.5)] hover:shadow-[0_6px_20px_rgba(34,197,94,0.7)] ring-2 ring-green-300 drop-shadow-xl scale-105"
+          : "bg-gradient-to-r from-red-400 to-red-600 text-white border-red-700 shadow-[0_4px_15px_rgba(239,68,68,0.5)] hover:shadow-[0_6px_20px_rgba(239,68,68,0.7)] ring-2 ring-red-300 drop-shadow-xl scale-105"
+        : hasValidAnswer
+        ? "bg-gradient-to-r from-yellow-400 to-yellow-500 text-white border-yellow-600 shadow-[0_4px_15px_rgba(234,179,8,0.5)] hover:shadow-[0_6px_20px_rgba(234,179,8,0.7)] ring-2 ring-yellow-300 drop-shadow-xl scale-105"
+        : selectedIndex === index
+        ? "bg-green-500 text-white border-green-700 shadow-[0_4px_15px_rgba(34,197,94,0.5)] hover:shadow-[0_6px_20px_rgba(34,197,94,0.7)] ring-2 ring-green-300 drop-shadow-xl scale-105"
+        : "bg-gray-200 text-gray-700 border-white shadow-[4px_4px_10px_rgba(0,0,0,0.2)] hover:shadow-[6px_6px_12px_rgba(0,0,0,0.3)] active:shadow-[2px_2px_6px_rgba(0,0,0,0.3)]"
+    }
+    ${selectedIndex === index ? "ring-4 ring-white" : ""}
+  `}
                 >
                   {index + 1}
                 </button>
@@ -427,7 +429,7 @@ const PracticeQuestionRight = ({
         </div>
         {localStorage.getItem("showSolutions") && (
           <div
-            className="px-4 z-100 w-64 py-5 text-base font-bold rounded-xl transition-all duration-300 
+            className="px-2 z-100 w-64 py-4 text-base font-bold rounded-xl transition-all duration-300 
       bg-gradient-to-r from-green-400 to-teal-600 text-white shadow-lg ring-2 ring-teal-300 
       hover:from-green-500 hover:to-teal-700 hover:shadow-xl 
       active:shadow-none active:translate-y-1 border border-green-800 uppercase 
