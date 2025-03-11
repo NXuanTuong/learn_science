@@ -48,6 +48,8 @@ const FlyDrag = ({
         updatedIndices.push(index);
       }
 
+      const incrementedIndices = updatedIndices.map((index) => index + 1);
+
       dispatch(
         setUserAnswer({
           id:
@@ -57,7 +59,7 @@ const FlyDrag = ({
           answer: updatedIndices,
           questionIndex: selectedQuestion,
           template: "MultipleResponse",
-          userChoice: updatedIndices,
+          userChoice: incrementedIndices,
         })
       );
 
@@ -75,6 +77,7 @@ const FlyDrag = ({
       let updatedIndices = prev.map((i, idx) => (idx === index ? -1 : i));
       const allRemoved = updatedIndices.every((i) => i === -1); // Kiểm tra nếu chỉ toàn `-1`
       const finalAnswer = allRemoved ? [] : updatedIndices;
+      const incrementedIndices = updatedIndices.map((index) => index + 1);
 
       dispatch(
         setUserAnswer({
@@ -85,7 +88,7 @@ const FlyDrag = ({
           answer: finalAnswer,
           questionIndex: selectedQuestion,
           template: "MultipleResponse",
-          userChoice: finalAnswer,
+          userChoice: updatedIndices,
         })
       );
 
@@ -127,7 +130,10 @@ const FlyDrag = ({
   );
 
   const isAllCorrect =
-    JSON.stringify(selectedIndices) === JSON.stringify(question.solutions);
+    JSON.stringify(
+      JSON.parse(localStorage.getItem("userAnswers"))[selectedQuestion]
+        ?.userChoice
+    ) === JSON.stringify(question.solutions);
 
   return (
     <>
@@ -170,7 +176,7 @@ const FlyDrag = ({
                         )}
 
                         {/* Hiệu ứng đường kẻ */}
-                        <div className="w-16 h-1 bg-green-700 mt-2 rounded-full transition-all duration-300"></div>
+                        <div className="h-1 bg-green-700 mt-2 rounded-full transition-all duration-300"></div>
                       </div>
                     ) : (
                       <div className="w-16 h-1 bg-gray-300 mt-4 rounded-full"></div>

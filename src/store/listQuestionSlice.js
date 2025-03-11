@@ -28,6 +28,10 @@ export const listQuestions = createSlice({
       state.status = action.payload;
     },
 
+    clearQuestion: (state) => {
+      state.listQuestions = [];
+    },
+
     setQuestionFinished: (state, action) => {
       state.questions[action.payload].isFinished = true;
     },
@@ -91,6 +95,7 @@ export const {
   setQuestionFinished,
   setUserAnswer,
   addUserAnswer,
+  clearQuestion,
 } = listQuestions.actions;
 
 export const selectQuestions = (state) => state.listQuestions.question;

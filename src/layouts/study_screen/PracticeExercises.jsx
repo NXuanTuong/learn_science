@@ -80,7 +80,7 @@ const PracticeExercises = ({ quizInformation, quiz }) => {
                 </div>
 
                 <p className="font-bold text-2xl text-[#007f5f] text-center tracking-wide">
-                  Thực Vật và Động Vật I
+                  Thực Vật và Động Vật 4
                 </p>
 
                 <button

@@ -3,6 +3,7 @@ import { connect, useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Cookies from "universal-cookie";
 import { submitAnswerPractice } from "../../config/quiz";
+import { clearQuestion } from "../../store/listQuestionSlice";
 import {
   getQuizInformations,
   selectAnsweredQuestions,
@@ -51,6 +52,8 @@ const PracticeQuestionRight = ({
     if (window.location.pathname === "/bai_kiem_tra_thuc_hanh") {
       localStorage.removeItem("newPracticeId");
       localStorage.removeItem("questionStateExams");
+    } else {
+      dispatch(clearQuestion());
     }
     setIsShowPopupCancel(false);
     setIsPopupOpen(false);
@@ -388,7 +391,7 @@ const PracticeQuestionRight = ({
         ? "bg-green-500 text-white border-green-700 shadow-[0_4px_15px_rgba(34,197,94,0.5)] hover:shadow-[0_6px_20px_rgba(34,197,94,0.7)] ring-2 ring-green-300 drop-shadow-xl scale-105"
         : "bg-gray-200 text-gray-700 border-white shadow-[4px_4px_10px_rgba(0,0,0,0.2)] hover:shadow-[6px_6px_12px_rgba(0,0,0,0.3)] active:shadow-[2px_2px_6px_rgba(0,0,0,0.3)]"
     }
-    ${selectedIndex === index ? "ring-4 ring-white" : ""}
+    ${selectedIndex === index ? "ring-2 ring-white" : ""}
   `}
                 >
                   {index + 1}
