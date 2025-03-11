@@ -5,9 +5,9 @@ import MenuTopBar from "./components/MenuTopBar";
 const StudyMainScreen = () => {
   return (
     <>
-      <div className="min-h-screen relative bg-cover bg-fixed bg-center bg-no-repeat bg-[url('/public/images/background_page_1.png')]">
+      <div className="min-h-screen  h-screen relative bg-cover bg-fixed bg-center bg-no-repeat bg-[url('/public/images/background_page_1.png')]">
         {/* <div className="min-h-screen relative bg-[#b2c4a9]"> */}
-        <div className="w-full flex justify-center items-center flex-col gap-[2rem] ">
+        <div className="w-full h-screen flex items-center flex-col gap-[2rem] ">
           <div className="w-full flex justify-center items-center flex-col pt-8">
             <MenuTopBar />
           </div>

@@ -14,6 +14,13 @@ const MultipleChoiceQuestion = ({
   questions,
 }: QuestionTemplateProps) => {
   const questionChoices = question.choices;
+  const questionText =
+    question.texts !== null &&
+    question.texts !== undefined &&
+    question.texts.length > 0
+      ? question.texts.map((text, index) => text)
+      : question.texts;
+
   const dispatch = useDispatch();
   const getGridCols = () => {
     if (questionChoices.length >= 6) return "grid-cols-4"; // 3 trên, 2 dưới
@@ -139,6 +146,10 @@ const MultipleChoiceQuestion = ({
 
   return (
     <>
+      {questionText !== null &&
+        questionText !== undefined &&
+        questionText.length > 0 && <div>{questionText}</div>}
+
       <div className="flex flex-col gap-8 justify-center items-center">
         <div className={`grid ${getGridCols()} gap-8 w-full`}>
           {questionChoices.map((choice, index) => {
