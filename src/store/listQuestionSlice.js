@@ -8,11 +8,19 @@ const initialState = {
 
 export const getLessonQuestion = createAsyncThunk(
   "listQuestions/getLessonQuestion",
-  async ({ lessonId, token }, thunkAPI) => {
+  async ({ lessonId, token,value }, thunkAPI) => {
     try {
       const { data } = await getListQuestions(lessonId, token);
+      let result = []
+      if (value == 1) {
+        result = data.result.filter((item)=> item?.type == 1)
+      }else if (value == 2) {
+        result = data.result.filter((item)=> item?.type == 2)
+      }else{
+        result = data.result.filter((item)=> item?.type == 3)
+      }
 
-      return data.result;
+      return result;
     } catch (error) {
       console.log(error);
       return thunkAPI.rejectWithValue(error.response?.data?.errorMessage);

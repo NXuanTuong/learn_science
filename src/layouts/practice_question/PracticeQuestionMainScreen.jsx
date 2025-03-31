@@ -24,11 +24,14 @@ const PracticeQuestionMainScreen = ({ questions }) => {
       setIsLoading(true);
     }
     let id = searchParams.get("id");
+    let value = searchParams.get("value");
+    console.log("value", value);
     let lessonId2="67cbccf76cd5f0e7bbc47987"
     dispatch(
       getLessonQuestion({
         lessonId: id ?? lessonId2,
         token,
+        value
       })
     ).finally(() => {
       setTimeout(() => {

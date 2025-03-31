@@ -8,6 +8,11 @@ import {
   createNewPractice,
   getQuizInformations,
 } from "../../store/quizQuestionSlice";
+const difficulties = [
+  { name: "Khởi động", value: 1 },
+  { name: "Tăng tốc", value: 2 },
+  { name: "Về đích", value: 3 },
+];
 
 const PracticeExercises = ({ quizInformation, quiz }) => {
   const navigate = useNavigate();
@@ -16,15 +21,30 @@ const PracticeExercises = ({ quizInformation, quiz }) => {
   const token = cookie.get("signin_user");
 
   const [showListUnit, setShowListUnit] = useState(false);
+  const [selectDifficulty, setSelectDifficulty] = useState(false);
+  const [lessonId, setLessonId] = useState("");
 
   const handleGetListQuestions = async (id) => {
+    try {
+      // localStorage.setItem(
+      //   "practiceName",
+      //   "Bài Tập về Khoa Học, Thực Vật, Động Vật..."
+      // );
+      // localStorage.removeItem("userAnswers");
+      setLessonId(id);
+      setSelectDifficulty(true);
+    } catch (error) {
+      console.log("Lỗi API:", error);
+    }
+  };
+  const handleSelectDifficulty = async (value) => {
     try {
       localStorage.setItem(
         "practiceName",
         "Bài Tập về Khoa Học, Thực Vật, Động Vật..."
       );
       localStorage.removeItem("userAnswers");
-      navigate("/cau_hoi_luyen_tap?id=" + id);
+      navigate("/cau_hoi_luyen_tap?id=" + lessonId + "&value=" + value);
     } catch (error) {
       console.log("Lỗi API:", error);
     }
@@ -67,7 +87,7 @@ const PracticeExercises = ({ quizInformation, quiz }) => {
   return (
     <>
       <div className="flex flex-row justify-center items-center gap-6 w-full relative">
-        {!showListUnit && (
+        {!showListUnit && !selectDifficulty && (
           <>
             <div className="relative w-[20rem] h-[22rem] cursor-pointer rounded-3xl border border-[#007f5f] bg-[#eaf7e3] shadow-xl transition-all duration-300 hover:shadow-2xl hover:ring-2 hover:ring-[#007f5f] hover:-translate-y-2">
               <div className="flex flex-col items-center gap-5 w-full h-full ">
@@ -122,8 +142,46 @@ const PracticeExercises = ({ quizInformation, quiz }) => {
             </div> */}
           </>
         )}
+        {selectDifficulty && (
+          <>
+          <span
+              onClick={() => {
+                setSelectDifficulty(false);
+                setLessonId("");
+              }}
+              className="absolute z-50 top-[20px] left-[150px] cursor-pointer flex items-center gap-2 px-6 py-3 bg-green-600 text-white font-semibold rounded-full shadow-lg transition-all duration-300 hover:bg-green-700 hover:scale-105 animate-bounce"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+              Quay lại chọn bài giảng
+            </span>
+          <div className="flex flex-col gap-[2rem] p-[3rem] items-center justify-center relative w-[20rem] h-[27rem] cursor-pointer rounded-3xl border border-[#007f5f] bg-[#eaf7e3] shadow-xl transition-all duration-300 hover:shadow-2xl hover:ring-2 hover:ring-[#007f5f] hover:-translate-y-2">
+            {difficulties.map((difficulty) => {
+              return (
+                <button
+                  key={difficulty}
+                  onClick={() => handleSelectDifficulty(difficulty.value)}
+                  className="cursor-pointer z-10 w-[10rem] h-[3rem] rounded-full bg-[#007f5f] text-white uppercase text-lg font-bold leading-none shadow-lg shadow-[#004a37] transition-all duration-300 ease-in-out transform hover:scale-100 hover:bg-[#005a40] hover:shadow-xl hover:shadow-[#005a40] hover:-translate-y-1"
+                >
+                  <p>{difficulty.name}</p>
+                </button>
+              );
+            })}
+          </div>
+          </>
+        )}
 
-        {showListUnit && (
+        {showListUnit && !selectDifficulty && (
           <>
             <span
               onClick={() => {
