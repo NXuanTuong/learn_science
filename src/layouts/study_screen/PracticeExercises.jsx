@@ -60,10 +60,10 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
     }
   };
 
-  const handleCreatePracticeQuiz = () => {
+  const handleCreatePracticeQuiz = (quizInformationId) => {
     dispatch(
       createNewPractice({
-        quizInforId: quizInformation._id,
+        quizInforId: quizInformationId,
         token,
       })
     );
@@ -147,7 +147,7 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
                       <button
                         onClick={() => {
                           showListAnUnit(item._id);
-                          localStorage.setItem("lessonName", item.name)
+                          localStorage.setItem("lessonName", item.name);
                         }}
                         className="cursor-pointer z-10 w-[10rem] h-[3rem] rounded-full bg-[#007f5f] text-white uppercase text-lg font-bold leading-none shadow-lg shadow-[#004a37] transition-all duration-300 ease-in-out transform hover:scale-100 hover:bg-[#005a40] hover:shadow-xl hover:shadow-[#005a40] hover:-translate-y-1"
                       >
@@ -360,7 +360,7 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
                 <button
                   onClick={() =>
                     localStorage.getItem("scorePractice") &&
-                    handleCreatePracticeQuiz()
+                    handleCreatePracticeQuiz(listAnUnit.quizId)
                   }
                   className={`cursor-pointer z-10 w-[10rem] h-[3rem] rounded-full text-white uppercase text-lg font-bold leading-none shadow-lg transition-all duration-300 ease-in-out transform ${
                     !localStorage.getItem("scorePractice")

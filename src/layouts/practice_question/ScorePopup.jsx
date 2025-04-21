@@ -98,28 +98,31 @@ const ScorePopup = ({
 
     if (percentage >= 80) {
       setGold(true);
-      let value = searchParams.get("value");
-      let id = searchParams.get("id");
-      let lessonId2 = "67cbccf76cd5f0e7bbc47987";
-      const { data } = await addAchievement(token, {
-        itemId: id ?? lessonId2,
-        difficulty: Number(value),
-        type: 1,
-      });
-      setTimeout(() => {
-        setShowRewardPopup(data.result);
-        if (data.result === true) {
-          audioRef3.current?.play();
-        }
-      }, 1200); // hoặc 10000 nếu bạn muốn
+      if (window.location.pathname !== "/bai_kiem_tra_thuc_hanh") {
+        let value = searchParams.get("value");
+        let id = searchParams.get("id");
+        let lessonId2 = "67cbccf76cd5f0e7bbc47987";
+        const { data } = await addAchievement(token, {
+          itemId: id ?? lessonId2,
+          difficulty: Number(value),
+          type: 1,
+        });
+        setTimeout(() => {
+          setShowRewardPopup(data.result);
+          if (data.result === true) {
+            audioRef3.current?.play();
+          }
+        }, 1200); // hoặc 10000 nếu bạn muốn
+      }
     } else {
       setGold(false);
-
-      setTimeout(() => {
-        setShowRewardPopup(true);
-        audioRef4.current?.play();
-        // KHÔNG setIsPopupCaculationScore(false) nữa
-      }, 1200); // hoặc 10000 nếu bạn muốn
+      if (window.location.pathname !== "/bai_kiem_tra_thuc_hanh") {
+        setTimeout(() => {
+          setShowRewardPopup(true);
+          audioRef4.current?.play();
+          // KHÔNG setIsPopupCaculationScore(false) nữa
+        }, 1200); // hoặc 10000 nếu bạn muốn
+      }
     }
 
     setCorrectCount(correct);
