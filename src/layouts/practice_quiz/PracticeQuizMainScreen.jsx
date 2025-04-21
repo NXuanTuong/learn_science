@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useEffect } from "react";
 import { connect, useDispatch } from "react-redux";
 import Cookies from "universal-cookie";
@@ -11,6 +11,7 @@ import {
 } from "../../store/quizQuestionSlice";
 import PracticeQuestionLeft from "../practice_question/PracticeQuestionLeft";
 import PracticeQuestionRight from "../practice_question/PracticeQuestionRight";
+import { sound1, sound2 } from "../../helper/sounds";
 
 const PracticeQuizMainScreen = ({ quizInformation, questions }) => {
   const dispatch = useDispatch();
@@ -21,6 +22,7 @@ const PracticeQuizMainScreen = ({ quizInformation, questions }) => {
   const [isLoadingShowSolution, setIsLoadingShowSolution] = useState(
     localStorage.getItem("showSolutions") === "true"
   );
+  const audioRef = useRef(null);
 
   const handleQuestionChange = (val) => {
     if (
@@ -62,7 +64,21 @@ const PracticeQuizMainScreen = ({ quizInformation, questions }) => {
     setSelectedQuestion(val);
   };
 
+  const stopAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+  };
+
   useEffect(() => {
+     if (!audioRef.current) {
+          audioRef.current = new Audio(
+            localStorage.getItem("lessonName") === "Thực vật và Động vật"
+              ? sound1
+              : sound2
+          );
+        }
     if (questions && questions.length > 0) {
       const storedAnswers = localStorage.getItem("userAnswers");
 
@@ -160,6 +176,7 @@ const PracticeQuizMainScreen = ({ quizInformation, questions }) => {
           questions={questions}
           selectedIndex={selectedQuestion}
           handleQuestionChange={handleQuestionChange}
+          stopAudio={stopAudio}
         />
       </div>
     </>

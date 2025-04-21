@@ -60,6 +60,7 @@ const PracticeQuestionRight = ({
     if (window.location.pathname === "/bai_kiem_tra_thuc_hanh") {
       localStorage.removeItem("newPracticeId");
       localStorage.removeItem("questionStateExams");
+      localStorage.removeItem("showListUnit");
     } else {
       dispatch(clearQuestion());
     }
