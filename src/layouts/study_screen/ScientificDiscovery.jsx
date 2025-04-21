@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
+import { connect } from "react-redux";
 
-const ScientificDiscovery = () => {
+const ScientificDiscovery = ({ listUnit }) => {
   const playersRef = useRef([]);
 
   useEffect(() => {
@@ -99,4 +100,10 @@ const ScientificDiscovery = () => {
   );
 };
 
-export default ScientificDiscovery;
+function mapStateToProps(state) {
+  return {
+    listUnit: state.lesson.listUnit,
+  };
+}
+
+export default connect(mapStateToProps)(ScientificDiscovery);

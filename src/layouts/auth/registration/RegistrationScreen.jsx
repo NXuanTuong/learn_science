@@ -1,6 +1,6 @@
 import React from "react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { register } from "../../../config/auth";
 
@@ -12,6 +12,7 @@ const RegistrationScreen = () => {
     email: "",
     password: "",
   });
+  const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -36,7 +37,8 @@ const RegistrationScreen = () => {
       });
 
       if (response) {
-        return toast.success("Đăng nhập thành công");
+        toast.success("Đăng ký thành công");
+        navigate("/dang_nhap");
       }
     } catch (error) {
       return toast.error(

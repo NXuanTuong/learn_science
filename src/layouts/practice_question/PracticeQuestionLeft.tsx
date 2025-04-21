@@ -4,6 +4,8 @@ import MultipleChoiceQuestion from "../../templates/MutilpleChoice";
 import MultipleResponseQuestion from "../../templates/MutilpleResponse";
 import FlyDrag from "../../templates/FlyDrag";
 import Matching from "../../templates/Matching";
+import GapfillInline from "../../templates/GapfillInline";
+import Gapfill from "../../templates/GapFill";
 
 const PracticeQuestionLeft = ({
   question,
@@ -67,6 +69,28 @@ const PracticeQuestionLeft = ({
       case "Matching":
         return (
           <Matching
+            questionItem={question}
+            question={question.question}
+            selectedQuestion={selectedQuestion}
+            questionId={question.questionId}
+            handleQuestionChange={handleQuestionChange}
+            questions={questions}
+          />
+        );
+      case "GapFill":
+        return (
+          <Gapfill
+            questionItem={question}
+            question={question.question}
+            selectedQuestion={selectedQuestion}
+            questionId={question.questionId}
+            handleQuestionChange={handleQuestionChange}
+            questions={questions}
+          />
+        );
+      case "GapFillInline":
+        return (
+          <GapfillInline
             questionItem={question}
             question={question.question}
             selectedQuestion={selectedQuestion}

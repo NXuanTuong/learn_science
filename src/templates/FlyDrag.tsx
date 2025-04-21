@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { setUserAnswer } from "../store/listQuestionSlice";
 import { QuestionTemplateProps } from "../interface/question";
 import React from "react";
+import { clickButton } from "../helper/sounds";
 
 const FlyDrag = ({
   question,
@@ -14,7 +15,10 @@ const FlyDrag = ({
   let questionChoices = question.choices;
   const questionTexts = question.texts;
   const questionSolutions = question.solutions;
+  const questionsExplanation = questionItem.explanation.texts;
   const dispatch = useDispatch();
+  const audio = new Audio(clickButton);
+  const [showExplation, setShowExplation] = useState(false);
 
   const [selectedIndices, setSelectedIndices] = useState(() => {
     const storedAnswers = localStorage.getItem("userAnswers");
@@ -32,6 +36,7 @@ const FlyDrag = ({
   });
 
   const handleSelect = (index: number) => {
+    audio.play();
     if (
       selectedIndices.length == questionSolutions.length &&
       selectedIndices.every((item) => item !== -1)
@@ -73,6 +78,7 @@ const FlyDrag = ({
 
   // Khi bấm vào choice trên câu hỏi để đưa về danh sách gốc
   const handleDeselect = (index: number) => {
+    audio.play();
     setSelectedIndices((prev) => {
       let updatedIndices = prev.map((i, idx) => (idx === index ? -1 : i));
       const allRemoved = updatedIndices.every((i) => i === -1); // Kiểm tra nếu chỉ toàn `-1`
@@ -100,7 +106,7 @@ const FlyDrag = ({
     });
   };
 
-  const saveAnswer = (answer, questionId) => {
+  const saveAnswer = (answer: any, questionId: String) => {
     const submit = {
       submit: false,
       questions: [
@@ -146,7 +152,7 @@ const FlyDrag = ({
                 // className=" flex flex-row  gap-4"
               >
                 {/* Câu hỏi */}
-                <span className="text-xl font-semibold text-green-900">
+                <span className="text-xl font-semibold  select-none text-green-900">
                   {text}
                 </span>
 
@@ -214,7 +220,7 @@ const FlyDrag = ({
                             -1
                           ))
                       }
-                      className={`w-[9rem] h-auto cursor-pointer p-3 text-lg font-bold rounded-lg transition-all duration-300 ease-in-out
+                      className={`max-w-[15rem] h-auto cursor-pointer p-3 text-lg font-bold rounded-lg transition-all duration-300 ease-in-out
                       ${
                         selectedIndices.includes(index) // Kiểm tra nếu index nằm trong danh sách lựa chọn
                           ? JSON.parse(showSolutions)
@@ -249,45 +255,78 @@ const FlyDrag = ({
               {isAllCorrect ? "✅ Đúng rồi!" : "Sai rồi!"}
             </p>
 
-            <p className="text-yellow-500 text-2xl font-semibold tracking-widest">
-              ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨
-            </p>
+            {isAllCorrect ? (
+              <></>
+            ) : (
+              <>
+                <p className="text-yellow-500 text-2xl font-semibold tracking-widest">
+                  ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨
+                </p>
 
-            <div className="w-full  flex flex-col justify-center items-center bg-white p-4 rounded-lg shadow-md border border-gray-300">
-              <p className="text-lg font-bold text-gray-800 mb-2">
-                🎯 Đáp án đúng:
-              </p>
-              {questionTexts && questionTexts?.length > 0 && (
-                <div className="flex flex-row flex-wrap gap-1 items-end p-4 bg-gradient-to-r from-green-200 to-blue-200 rounded-xl shadow-lg">
-                  {questionTexts.map((text: any, index: any) => (
-                    <Fragment
-                      key={index}
-                      // className="text-center flex flex-row items-center gap-4"
-                    >
-                      {/* Câu hỏi */}
-                      <span className="text-xl font-semibold text-green-900">
-                        {text}
-                      </span>
-
-                      {index < questionTexts.length - 1 && (
-                        <>
-                          <span className="flex flex-col items-center">
-                            {/* Lựa chọn được chọn */}
-
-                            <div className="bg-green-600 text-white px-4 py-2 rounded-xl shadow-lg transition-transform duration-300 ease-in-out hover:scale-110 cursor-pointer flex items-center gap-2">
-                              {questionChoices[questionSolutions[index] - 1]}
-                            </div>
-
-                            {/* Hiệu ứng đường kẻ */}
-                            <div className="w-16 h-1 bg-green-700 mt-2 rounded-full transition-all duration-300"></div>
+                <div className="w-full  flex flex-col justify-center items-center bg-white p-4 rounded-lg shadow-md border border-gray-300">
+                  <p className="text-lg font-bold text-gray-800 mb-2">
+                    🎯 Đáp án đúng:
+                  </p>
+                  {questionTexts && questionTexts?.length > 0 && (
+                    <div className="flex flex-row flex-wrap gap-1 items-end p-4 bg-gradient-to-r from-green-200 to-blue-200 rounded-xl shadow-lg">
+                      {questionTexts.map((text: any, index: any) => (
+                        <Fragment
+                          key={index}
+                          // className="text-center flex flex-row items-center gap-4"
+                        >
+                          {/* Câu hỏi */}
+                          <span className="text-xl font-semibold select-none text-green-900">
+                            {text}
                           </span>
-                        </>
-                      )}
-                    </Fragment>
-                  ))}
+
+                          {index < questionTexts.length - 1 && (
+                            <>
+                              <span className="flex flex-col items-center">
+                                {/* Lựa chọn được chọn */}
+
+                                <div className="bg-green-600 text-white px-4 py-2 rounded-xl shadow-lg transition-transform duration-300 ease-in-out hover:scale-110 cursor-pointer flex items-center gap-2">
+                                  {
+                                    questionChoices[
+                                      questionSolutions[index] - 1
+                                    ]
+                                  }
+                                </div>
+
+                                {/* Hiệu ứng đường kẻ */}
+                                <div className="w-16 h-1 bg-green-700 mt-2 rounded-full transition-all duration-300"></div>
+                              </span>
+                            </>
+                          )}
+                        </Fragment>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+
+                {!showExplation ? (
+                  <button
+                    onClick={() => setShowExplation(true)}
+                    className="relative inline-flex items-center justify-center px-6 py-3 overflow-hidden font-bold text-white transition-all duration-300 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-xl shadow-lg hover:shadow-xl hover:scale-105 hover:from-blue-600 hover:to-purple-600"
+                  >
+                    <span className="relative z-10">🚨 Xem phao cứu trợ</span>
+                  </button>
+                ) : (
+                  <div className="space-y-3 bg-blue-50 border border-blue-200 p-5 rounded-xl shadow-sm">
+                    <p className="text-center text-blue-700 uppercase font-semibold text-lg tracking-wider">
+                      🛟 Phao Cứu Sinh
+                    </p>
+                    {questionsExplanation.map((line, index) => (
+                      <p
+                        key={index}
+                        className="text-gray-800 text-base leading-relaxed"
+                      >
+                        {line}
+                      </p>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
           </div>
         )}
       </div>
@@ -296,7 +335,11 @@ const FlyDrag = ({
         className={`w-full max-w-[60rem] absolute left-1/2 bottom-[-5rem] transform -translate-x-1/2 flex flex-row justify-between items-center h-auto`}
       >
         <button
-          onClick={() => handleQuestionChange(selectedQuestion - 1)}
+          onClick={() => {
+            audio.play();
+            handleQuestionChange(selectedQuestion - 1);
+            setShowExplation(false);
+          }}
           disabled={selectedQuestion === 0}
           className={`px-6 cursor-pointer py-3 text-lg font-bold rounded-full transition-all duration-300 
           ${
@@ -311,7 +354,11 @@ const FlyDrag = ({
         {questions.length - 1 !== selectedQuestion ? (
           selectedIndices.length > 0 ? (
             <button
-              onClick={() => handleQuestionChange(selectedQuestion + 1)}
+              onClick={() => {
+                audio.play();
+                handleQuestionChange(selectedQuestion + 1);
+                setShowExplation(false);
+              }}
               className="px-6 cursor-pointer py-3 text-lg font-bold rounded-full transition-all duration-300 
              bg-gradient-to-b from-white to-green-300 text-green-900 shadow-md 
              hover:from-green-200 hover:to-green-500 hover:shadow-lg 
@@ -321,7 +368,11 @@ const FlyDrag = ({
             </button>
           ) : (
             <button
-              onClick={() => handleQuestionChange(selectedQuestion + 1)}
+              onClick={() => {
+                audio.play();
+                handleQuestionChange(selectedQuestion + 1);
+                setShowExplation(false);
+              }}
               className="px-6 py-3 cursor-pointer text-lg font-bold rounded-full transition-all duration-300 
              bg-gradient-to-b from-white to-orange-300 text-orange-900 shadow-md 
              hover:from-orange-200 hover:to-orange-500 hover:shadow-lg 

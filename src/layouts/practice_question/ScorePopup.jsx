@@ -1,5 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { connect, useDispatch } from "react-redux";
+import { useSearchParams } from "react-router-dom";
+import Cookies from "universal-cookie";
+import { addAchievement } from "../../config/achievement";
+import { sound3, sound4 } from "../../helper/sounds";
 
 const ScorePopup = ({
   isPopupCaculationScore,
@@ -8,22 +12,66 @@ const ScorePopup = ({
   setIsLoadingShowSolution,
   handleQuestionChange,
   quizInformation,
+  setIsRedo,
+  setIsLoading,
+  setSelectedQuestion,
+  stopAudio,
 }) => {
   const [isLoadingScore, setIsLoadingScore] = useState(true);
   const [correctCount, setCorrectCount] = useState(0);
+  const [showRewardPopup, setShowRewardPopup] = useState(false);
+  const [gold, setGold] = useState(true);
+  const cookie = new Cookies();
+  const token = cookie.get("signin_user");
+  const [searchParams] = useSearchParams();
+
+  const updateIsRedo = () => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const isRedo = searchParams.get("isRedo") === "true";
+    searchParams.set("isRedo", (!isRedo).toString());
+
+    const newUrl = `${window.location.pathname}?${searchParams.toString()}`;
+    window.history.replaceState(null, "", newUrl);
+  };
+  const audioRef3 = useRef(null); // tạo ref cho audio
+  const audioRef4 = useRef(null); // tạo ref cho audio
 
   useEffect(() => {
+    if (!audioRef3.current) {
+      audioRef3.current = new Audio(sound3);
+    }
+
+    if (!audioRef4.current) {
+      audioRef4.current = new Audio(sound4);
+    }
+
     if (isPopupCaculationScore) {
       setIsLoadingScore(true);
 
+      stopAudio();
       setTimeout(() => {
         calculateScore();
         setIsLoadingScore(false);
       }, 2000);
     }
-  }, [isPopupCaculationScore]);
+  }, [isPopupCaculationScore, audioRef3, audioRef4]);
 
-  const calculateScore = () => {
+  // useEffect(() => {
+  //   if (
+  //     !isLoadingScore &&
+  //     isPopupCaculationScore &&
+  //     window.location.pathname !== "/bai_kiem_tra_thuc_hanh"
+  //   ) {
+  //     const timeout = setTimeout(() => {
+  //       setShowRewardPopup(true); // chỉ hiện reward popup
+  //       // KHÔNG setIsPopupCaculationScore(false) nữa
+  //     }, 2000); // hoặc 10000 nếu bạn muốn
+
+  //     return () => clearTimeout(timeout);
+  //   }
+  // }, [isLoadingScore, isPopupCaculationScore]);
+
+  const calculateScore = async () => {
     const storedAnswers = JSON.parse(localStorage.getItem("userAnswers")) || [];
 
     let correct = 0;
@@ -46,7 +94,71 @@ const ScorePopup = ({
       }
     });
 
+    const percentage = (correct / questions.length) * 100;
+
+    if (percentage >= 80) {
+      setGold(true);
+      let value = searchParams.get("value");
+      let id = searchParams.get("id");
+      let lessonId2 = "67cbccf76cd5f0e7bbc47987";
+      const { data } = await addAchievement(token, {
+        itemId: id ?? lessonId2,
+        difficulty: Number(value),
+        type: 1,
+      });
+      setTimeout(() => {
+        setShowRewardPopup(data.result);
+        if (data.result === true) {
+          audioRef3.current?.play();
+        }
+      }, 1200); // hoặc 10000 nếu bạn muốn
+    } else {
+      setGold(false);
+
+      setTimeout(() => {
+        setShowRewardPopup(true);
+        audioRef4.current?.play();
+        // KHÔNG setIsPopupCaculationScore(false) nữa
+      }, 1200); // hoặc 10000 nếu bạn muốn
+    }
+
     setCorrectCount(correct);
+  };
+
+  const stopAudio1 = () => {
+    if (audioRef3.current) {
+      audioRef3.current.pause();
+      audioRef3.current.currentTime = 0;
+    }
+  };
+
+  const stopAudio2 = () => {
+    if (audioRef4.current) {
+      audioRef4.current.pause();
+      audioRef4.current.currentTime = 0;
+    }
+  };
+
+  const renderRewardContent = () => {
+    if (gold) {
+      return (
+        <>
+          {localStorage.getItem("type") === "1" ? (
+            <img src="/images/trung_dong.png" alt="" />
+          ) : localStorage.getItem("type") === "2" ? (
+            <img src="/images/trung_bac.png" alt="" />
+          ) : (
+            <img src="/images/trung_vang.png" alt="" />
+          )}
+        </>
+      );
+    } else {
+      return (
+        <>
+          <img src="/images/trung_0.png" alt="" />
+        </>
+      );
+    }
   };
 
   return (
@@ -102,9 +214,7 @@ const ScorePopup = ({
                 câu
               </p>
 
-              {/* Nút hành động */}
               <div className="flex justify-center gap-6 mt-6">
-                {/* Nút xem lời giải (Lấy cảm hứng từ màu cây cỏ, khoa học sinh học) */}
                 <button
                   onClick={() => {
                     localStorage.setItem("showSolutions", "true");
@@ -113,6 +223,8 @@ const ScorePopup = ({
                     handleQuestionChange(0);
                     localStorage.setItem("scorePractice", correctCount);
                     localStorage.setItem("maxScore", questions.length);
+                    stopAudio1();
+                    stopAudio2();
                   }}
                   className="cursor-pointer px-6 py-3 bg-gradient-to-r
                   from-green-500 to-green-700 text-white font-medium rounded-lg
@@ -125,6 +237,51 @@ const ScorePopup = ({
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {showRewardPopup && (
+        <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm z-[1101] transition-opacity duration-300">
+          <div className="bg-white p-6 rounded-3xl shadow-xl text-center w-[53rem] relative">
+            {renderRewardContent()}
+            <div className="flex justify-center gap-4 mt-4">
+              {/* Nút xem lời giải (Lấy cảm hứng từ màu cây cỏ, khoa học sinh học) */}
+              <button
+                onClick={() => {
+                  localStorage.setItem("showSolutions", "true");
+                  setIsLoadingShowSolution(true);
+                  setIsPopupCaculationScore(false);
+                  handleQuestionChange(0);
+                  localStorage.setItem("scorePractice", correctCount);
+                  localStorage.setItem("maxScore", questions.length);
+                  stopAudio1();
+                  stopAudio2();
+                }}
+                className="cursor-pointer px-6 py-3 bg-gradient-to-r
+                  from-green-500 to-green-700 text-lg text-white font-medium rounded-lg
+                  shadow-lg hover:opacity-90 transition-all transform
+                  hover:scale-105 active:scale-95" // onClick=
+              >
+                {" "}
+                📖 Xem lời giải
+              </button>
+            </div>
+            <button
+              onClick={() => {
+                updateIsRedo();
+                setShowRewardPopup(false);
+                setIsRedo(true);
+                setIsLoading(true);
+                setSelectedQuestion(0);
+                localStorage.removeItem("userAnswers");
+                stopAudio1();
+                stopAudio2();
+              }}
+              className="mt-3 cursor-pointer px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 hover:scale-105 transition-all duration-300 ease-in-out"
+            >
+              🔁 Làm lại nhé!
+            </button>
+          </div>
         </div>
       )}
     </>

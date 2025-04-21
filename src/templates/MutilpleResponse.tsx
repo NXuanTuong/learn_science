@@ -4,6 +4,7 @@ import { setUserAnswer } from "../store/listQuestionSlice";
 import { QuestionTemplateProps } from "../interface/question";
 import React from "react";
 import { selectAnsweredQuestions } from "../store/quizQuestionSlice";
+import { clickButton } from "../helper/sounds";
 
 const MultipleResponseQuestion = ({
   question,
@@ -14,14 +15,17 @@ const MultipleResponseQuestion = ({
   questionItem,
 }: QuestionTemplateProps) => {
   const questionChoices = question.choices;
+  const questionsExplanation = questionItem.explanation.texts;
   const dispatch = useDispatch();
 
+  const audio = new Audio(clickButton);
   const getGridCols = () => {
     if (questionChoices.length >= 6) return "grid-cols-4"; // 3 trên, 2 dưới
     if (questionChoices.length === 5) return "grid-cols-3"; // 3 trên, 2 dưới
     if (questionChoices.length === 4) return "grid-cols-2"; // 2 trên, 2 dưới
     return "grid-cols-3"; // 3 trong một hàng
   };
+  const [showExplation, setShowExplation] = useState(false);
 
   const answeredQuestions = useSelector(selectAnsweredQuestions);
 
@@ -41,6 +45,7 @@ const MultipleResponseQuestion = ({
   });
 
   const handleSelect = (index) => {
+    audio.play();
     if (window.location.pathname === "/bai_kiem_tra_thuc_hanh") {
       if (selectedIndices.includes(index)) {
         saveAnswer(selectedIndices.filter((item) => item !== index));
@@ -190,31 +195,60 @@ const MultipleResponseQuestion = ({
               {isAllCorrect ? "✅ Đúng rồi!" : "Sai rồi!"}
             </p>
 
-            <p className="text-yellow-500 text-2xl font-semibold tracking-widest">
-              ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨
-            </p>
+            {isAllCorrect ? (
+              <></>
+            ) : (
+              <>
+                <p className="text-yellow-500 text-2xl font-semibold tracking-widest">
+                  ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨
+                </p>
 
-            <div className="w-full flex flex-col justify-center items-center bg-white p-4 rounded-lg shadow-md border border-gray-300">
-              <p className="text-lg font-bold text-gray-800 mb-2">
-                🎯 Đáp án đúng:
-              </p>
-              <div className="flex flex-row gap-5">
-                {questionChoices.map((choice, index) =>
-                  question.solutions[index] ? ( // Chỉ hiển thị nếu đúng (true)
-                    <button
-                      key={index}
-                      disabled={JSON.parse(showSolutions)}
-                      className={`w-[9rem] h-auto cursor-pointer p-3 text-lg font-bold rounded-lg relative transition-all duration-300 ease-in-out
+                <div className="w-full flex flex-col justify-center items-center bg-white p-4 rounded-lg shadow-md border border-gray-300">
+                  <p className="text-lg font-bold text-gray-800 mb-2">
+                    🎯 Đáp án đúng:
+                  </p>
+                  <div className="flex flex-row gap-5">
+                    {questionChoices.map((choice, index) =>
+                      question.solutions[index] ? ( // Chỉ hiển thị nếu đúng (true)
+                        <button
+                          key={index}
+                          disabled={JSON.parse(showSolutions)}
+                          className={`w-[9rem] h-auto cursor-pointer p-3 text-lg font-bold rounded-lg relative transition-all duration-300 ease-in-out
                       bg-green-500 text-white shadow-[0px_4px_0px_#1B5E20] scale-105 border border-white
                       hover:from-green-400 hover:to-green-600 hover:shadow-[1px_1px_0px_#1B5E20]
                       active:shadow-none active:translate-y-[2px] active:translate-x-[2px]`}
-                    >
-                      {choice}
-                    </button>
-                  ) : null
+                        >
+                          {choice}
+                        </button>
+                      ) : null
+                    )}
+                  </div>
+                </div>
+
+                {!showExplation ? (
+                  <button
+                    onClick={() => setShowExplation(true)}
+                    className="relative inline-flex items-center justify-center px-6 py-3 overflow-hidden font-bold text-white transition-all duration-300 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-xl shadow-lg hover:shadow-xl hover:scale-105 hover:from-blue-600 hover:to-purple-600"
+                  >
+                    <span className="relative z-10">🚨 Xem phao cứu trợ</span>
+                  </button>
+                ) : (
+                  <div className="space-y-3 bg-blue-50 border border-blue-200 p-5 rounded-xl shadow-sm">
+                    <p className="text-center text-blue-700 uppercase font-semibold text-lg tracking-wider">
+                      🛟 Phao Cứu Sinh
+                    </p>
+                    {questionsExplanation.map((line, index) => (
+                      <p
+                        key={index}
+                        className="text-gray-800 text-base leading-relaxed"
+                      >
+                        {line}
+                      </p>
+                    ))}
+                  </div>
                 )}
-              </div>
-            </div>
+              </>
+            )}
           </div>
         )}
       </div>
@@ -223,7 +257,11 @@ const MultipleResponseQuestion = ({
         className={`w-full max-w-[60rem] absolute left-1/2 bottom-[-5rem] transform -translate-x-1/2 flex flex-row justify-between items-center h-auto`}
       >
         <button
-          onClick={() => handleQuestionChange(selectedQuestion - 1)}
+          onClick={() => {
+            audio.play();
+            handleQuestionChange(selectedQuestion - 1);
+            setShowExplation(false);
+          }}
           disabled={selectedQuestion === 0}
           className={`px-6 cursor-pointer py-3 text-lg font-bold rounded-full transition-all duration-300 
           ${
@@ -238,7 +276,11 @@ const MultipleResponseQuestion = ({
         {questions.length - 1 !== selectedQuestion ? (
           selectedIndices.length > 0 ? (
             <button
-              onClick={() => handleQuestionChange(selectedQuestion + 1)}
+              onClick={() => {
+                audio.play();
+                handleQuestionChange(selectedQuestion + 1);
+                setShowExplation(false);
+              }}
               className="px-6 cursor-pointer py-3 text-lg font-bold rounded-full transition-all duration-300 
              bg-gradient-to-b from-white to-green-300 text-green-900 shadow-md 
              hover:from-green-200 hover:to-green-500 hover:shadow-lg 
@@ -248,7 +290,11 @@ const MultipleResponseQuestion = ({
             </button>
           ) : (
             <button
-              onClick={() => handleQuestionChange(selectedQuestion + 1)}
+              onClick={() => {
+                audio.play();
+                handleQuestionChange(selectedQuestion + 1);
+                setShowExplation(false);
+              }}
               className="px-6 py-3 cursor-pointer text-lg font-bold rounded-full transition-all duration-300 
              bg-gradient-to-b from-white to-orange-300 text-orange-900 shadow-md 
              hover:from-orange-200 hover:to-orange-500 hover:shadow-lg 

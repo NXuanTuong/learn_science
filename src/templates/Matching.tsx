@@ -3,6 +3,8 @@ import { useDispatch } from "react-redux";
 import { setUserAnswer } from "../store/listQuestionSlice";
 import { QuestionTemplateProps } from "../interface/question";
 import React from "react";
+import { clickButton } from "../helper/sounds";
+import ImageFromUrl from "../helper/imageFromUrl";
 
 const Matching = ({
   question,
@@ -13,8 +15,15 @@ const Matching = ({
 }: QuestionTemplateProps) => {
   const questionChoices = question.choices;
   const questionTargets = question.targets;
+  const questionsExplanation = questionItem.explanation.texts;
+   const questionsExplanationImages = questionItem.explanation.images;
+
+  console.log(questionTargets);
+
   const dispatch = useDispatch();
   const initialSelectedIndices = questionTargets.map((_, index) => [-1, -1]);
+  const audio = new Audio(clickButton);
+  const [showExplation, setShowExplation] = useState(false);
   const colors = [
     "#FF8C00", // Orange
     "#6A5ACD", // Slate Blue
@@ -41,6 +50,7 @@ const Matching = ({
   });
 
   const handleSelectLeft = (index) => {
+    audio.play();
     let existSelect = selectedIndices.findIndex(
       (item) => item[0] === index + 1
     );
@@ -141,6 +151,7 @@ const Matching = ({
   };
 
   const handleSelectRight = (index) => {
+    audio.play();
     let existSelect = selectedIndices.findIndex(
       (item) => item[1] === index + 1
     );
@@ -293,14 +304,54 @@ const Matching = ({
               const correctAnswer = question.solutions[index];
               const isCorrect = selectedValue === correctAnswer;
 
-              // Giữ màu nếu đã chọn trước đó, nếu không thì hiển thị đáp án đúng khi showSolutions bật
               const backgroundColor = isSelected
-                ? getColorForIndex(pairIndex) // Giữ màu nếu đã chọn
+                ? getColorForIndex(pairIndex)
                 : showSolutions
-                ? "white" // Màu nhạt hiển thị khi có đáp án (màu xanh nhạt)
-                : "white"; // Mặc định trắng khi chưa chọn và chưa hiển thị đáp án
+                ? "white"
+                : "white";
 
-              return (
+              const isImage = choice.includes("admin/");
+
+              return isImage ? (
+                // Hiển thị ảnh nếu là đường dẫn
+                <div
+                  key={index}
+                  onClick={() => handleSelectLeft(index)}
+                  className={`relative px-4 py-3 bg-white border-2 rounded-lg cursor-pointer transition-all duration-200 ease-in-out
+                  ${
+                    showSolutions
+                      ? isCorrect
+                        ? "outline outline-2 outline-green-700"
+                        : "outline outline-2 outline-red-700"
+                      : "outline outline-green-500"
+                  }
+                  hover:brightness-105 active:scale-95`}
+                  style={{
+                    backgroundColor,
+                    color: isSelected ? "white" : "#2E7D32",
+                    outlineColor: showSolutions
+                      ? isCorrect
+                        ? "#1B5E20"
+                        : "#B71C1C"
+                      : "#4CAF50",
+                  }}
+                >
+                  <ImageFromUrl
+                    className="mx-auto object-cover"
+                    objectId={choice}
+                    style={undefined}
+                    setImgWidth={undefined}
+                    handleSetIsLoading={undefined}
+                    onClick={undefined}
+                  />
+                  {showSolutions && (
+                    <span className="absolute right-2 top-2 text-lg">
+                      {isCorrect ? "✅" : "❌"}
+                    </span>
+                  )}
+                </div>
+              ) : (
+                // Hiển thị button nếu không phải là ảnh
                 <button
                   key={index}
                   onClick={() => handleSelectLeft(index)}
@@ -310,24 +361,22 @@ const Matching = ({
                     color: isSelected ? "white" : "#2E7D32",
                     outlineColor: showSolutions
                       ? isCorrect
-                        ? "#1B5E20" // Viền xanh nếu đúng
-                        : "#B71C1C" // Viền đỏ nếu sai
+                        ? "#1B5E20"
+                        : "#B71C1C"
                       : "#4CAF50",
                   }}
                   className={`min-w-[150px] px-6 py-3 text-lg font-bold rounded-lg transition-all duration-200 ease-in-out
-          flex items-center justify-center text-center whitespace-normal break-words relative
-          ${
-            showSolutions
-              ? isCorrect
-                ? "outline-2 outline-green-700"
-                : "outline-2 outline-red-700"
-              : "outline outline-green-500"
-          }
-          hover:brightness-110 hover:shadow-md active:scale-95 active:shadow-none`}
+        flex items-center justify-center text-center whitespace-normal break-words relative
+        ${
+          showSolutions
+            ? isCorrect
+              ? "outline-2 outline-green-700"
+              : "outline-2 outline-red-700"
+            : "outline outline-green-500"
+        }
+        hover:brightness-110 hover:shadow-md active:scale-95 active:shadow-none`}
                 >
                   {choice}
-
-                  {/* Nếu showSolutions bật, luôn hiển thị icon đúng/sai */}
                   {showSolutions && (
                     <span className="absolute right-2 top-2 text-lg">
                       {isCorrect ? "✅" : "❌"}
@@ -356,7 +405,51 @@ const Matching = ({
                 ? "white"
                 : "white";
 
-              return (
+              const isImage = choice.includes("admin/");
+
+              return isImage ? (
+                // Hiển thị ảnh nếu là đường dẫn
+                <div
+                  key={index}
+                  onClick={() => {
+                    if (!showSolutions) {
+                      handleSelectRight(index);
+                    }
+                  }}
+                  className={`relative px-4 py-3 bg-white border-2 rounded-lg cursor-pointer transition-all duration-200 ease-in-out
+                  ${
+                    showSolutions
+                      ? isCorrect
+                        ? "outline outline-2 outline-green-700"
+                        : "outline outline-2 outline-red-700"
+                      : "outline outline-green-500"
+                  }
+                  hover:brightness-105 active:scale-95`}
+                  style={{
+                    backgroundColor,
+                    color: isSelected ? "white" : "#2E7D32",
+                    outlineColor: showSolutions
+                      ? isCorrect
+                        ? "#1B5E20"
+                        : "#B71C1C"
+                      : "#4CAF50",
+                  }}
+                >
+                  <ImageFromUrl
+                    className="mx-auto object-cover"
+                    objectId={choice}
+                    style={undefined}
+                    setImgWidth={undefined}
+                    handleSetIsLoading={undefined}
+                    onClick={undefined}
+                  />
+                  {showSolutions && (
+                    <span className="absolute right-2 top-2 text-lg">
+                      {isCorrect ? "✅" : "❌"}
+                    </span>
+                  )}
+                </div>
+              ) : (
                 <button
                   key={index}
                   onClick={() => handleSelectRight(index)}
@@ -408,76 +501,200 @@ const Matching = ({
               {isAllCorrect ? "✅ Đúng rồi!" : "Sai rồi!"}
             </p>
 
-            <p className="text-yellow-500 text-2xl font-semibold tracking-widest">
-              ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨
-            </p>
+            {isAllCorrect ? (
+              <></>
+            ) : (
+              <>
+                <p className="text-yellow-500 text-2xl font-semibold tracking-widest">
+                  ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨
+                </p>
 
-            <div className="w-full max-w-[40rem] flex flex-col justify-center items-center bg-white p-4 rounded-lg shadow-md border border-gray-300">
-              <p className="text-lg font-bold text-gray-800 mb-2">
-                🎯 Đáp án đúng:
-              </p>
+                <div className="w-full max-w-[40rem] flex flex-col justify-center items-center bg-white p-4 rounded-lg shadow-md border border-gray-300">
+                  <p className="text-lg font-bold text-gray-800 mb-2">
+                    🎯 Đáp án đúng:
+                  </p>
 
-              <div className="grid grid-cols-2 gap-20">
-                {/* Cột trái - Giữ màu đã chọn và check đúng sai */}
-                <div className="grid grid-cols-1 gap-4 place-items-center w-full">
-                  {questionTargets.map((choice, index) => {
-                    const pairIndex = selectedIndices.findIndex(
-                      (item) => item[0] === index + 1
-                    );
-                    const isSelected = pairIndex !== -1;
+                  <div className="grid grid-cols-2 gap-20">
+                    {/* Cột trái - Giữ màu đã chọn và check đúng sai */}
+                    <div className="grid grid-cols-1 gap-4 place-items-center w-full">
+                      {questionTargets.map((choice, index) => {
+                        const pairIndex = selectedIndices.findIndex(
+                          (item) => item[0] === index + 1
+                        );
+                        const isSelected = pairIndex !== -1;
 
-                    // Giữ nguyên màu background nếu đã nối trước đó
-                    const backgroundColor = isSelected
-                      ? getColorForIndex(pairIndex) // Nếu đã chọn thì giữ màu của lần chọn
-                      : getColorForIndex(index); // Nếu chưa chọn thì lấy màu mặc định theo index
+                        // Giữ nguyên màu background nếu đã nối trước đó
+                        const backgroundColor = isSelected
+                          ? getColorForIndex(pairIndex) // Nếu đã chọn thì giữ màu của lần chọn
+                          : getColorForIndex(index); // Nếu chưa chọn thì lấy màu mặc định theo index
 
-                    return (
-                      <button
-                        key={index}
-                        onClick={() => handleSelectLeft(index)}
-                        disabled={JSON.parse(showSolutions)}
-                        className={`min-w-[150px] px-6 py-3 text-white text-lg font-bold rounded-lg transition-all duration-200 ease-in-out
+                        const isImage = choice.includes("admin/");
+
+                        return isImage ? (
+                          <>
+                            <div
+                              key={index}
+                              onClick={() => {
+                                if (showSolutions) {
+                                  return undefined;
+                                }
+                              }}
+                              className={`min-w-[150px] px-6 py-3 text-white text-lg font-bold rounded-lg transition-all duration-200 ease-in-out
             flex items-center justify-center text-center whitespace-normal break-words
             border-2 border-green-700 
             hover:brightness-110 hover:shadow-md active:scale-95 active:shadow-none relative`}
-                        style={{ backgroundColor }}
-                      >
-                        {choice}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* Cột phải - Hiển thị đúng đáp án theo solutions */}
-                <div className="grid grid-cols-1 gap-4 place-items-center w-full">
-                  {questionChoices.map((choice, index) => {
-                    const correctTargetIndex = question.solutions.indexOf(
-                      index + 1
-                    ); // Tìm vị trí đúng của câu trả lời này
-                    const isSelected = selectedIndices.some(
-                      (item) => item[1] === index + 1
-                    );
-                    const backgroundColor =
-                      correctTargetIndex !== -1
-                        ? getColorForIndex(correctTargetIndex)
-                        : "white";
-
-                    return (
-                      <button
-                        key={index}
-                        className={`min-w-[150px] px-6 py-3 text-white text-lg font-bold rounded-lg transition-all duration-200 ease-in-out
+                              style={{ backgroundColor }}
+                            >
+                              <ImageFromUrl
+                                className="mx-auto object-cover"
+                                objectId={choice}
+                                style={undefined}
+                                setImgWidth={undefined}
+                                handleSetIsLoading={undefined}
+                                onClick={undefined}
+                              />
+                            </div>
+                          </>
+                        ) : (
+                          <button
+                            key={index}
+                            disabled={JSON.parse(showSolutions)}
+                            className={`min-w-[150px] px-6 py-3 text-white text-lg font-bold rounded-lg transition-all duration-200 ease-in-out
             flex items-center justify-center text-center whitespace-normal break-words
             border-2 border-green-700 
             hover:brightness-110 hover:shadow-md active:scale-95 active:shadow-none relative`}
-                        style={{ backgroundColor }}
-                      >
-                        {choice}
-                      </button>
-                    );
-                  })}
+                            style={{ backgroundColor }}
+                          >
+                            {choice}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Cột phải - Hiển thị đúng đáp án theo solutions */}
+                    <div className="grid grid-cols-1 gap-4 place-items-center w-full">
+                      {questionChoices.map((choice, index) => {
+                        const correctTargetIndex = question.solutions.indexOf(
+                          index + 1
+                        ); // Tìm vị trí đúng của câu trả lời này
+                        const isSelected = selectedIndices.some(
+                          (item) => item[1] === index + 1
+                        );
+                        const backgroundColor =
+                          correctTargetIndex !== -1
+                            ? getColorForIndex(correctTargetIndex)
+                            : "white";
+
+                        const isImage = choice.includes("admin/");
+
+                        return isImage ? (
+                          <>
+                            {" "}
+                            <div
+                              key={index}
+                              onClick={() => {
+                                if (showSolutions) {
+                                  return undefined;
+                                }
+                              }}
+                              className={`min-w-[150px] px-6 py-3 text-white text-lg font-bold rounded-lg transition-all duration-200 ease-in-out
+            flex items-center justify-center text-center whitespace-normal break-words
+            border-2 border-green-700 
+            hover:brightness-110 hover:shadow-md active:scale-95 active:shadow-none relative`}
+                              style={{ backgroundColor }}
+                            >
+                              <ImageFromUrl
+                                className="mx-auto object-cover"
+                                objectId={choice}
+                                style={undefined}
+                                setImgWidth={undefined}
+                                handleSetIsLoading={undefined}
+                                onClick={undefined}
+                              />
+                            </div>
+                          </>
+                        ) : (
+                          <button
+                            key={index}
+                            className={`min-w-[150px] px-6 py-3 text-white text-lg font-bold rounded-lg transition-all duration-200 ease-in-out
+            flex items-center justify-center text-center whitespace-normal break-words
+            border-2 border-green-700 
+            hover:brightness-110 hover:shadow-md active:scale-95 active:shadow-none relative`}
+                            style={{ backgroundColor }}
+                          >
+                            {choice}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+
+                {!showExplation ? (
+                  <button
+                    onClick={() => setShowExplation(true)}
+                    className="relative inline-flex items-center justify-center px-6 py-3 overflow-hidden font-bold text-white transition-all duration-300 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-xl shadow-lg hover:shadow-xl hover:scale-105 hover:from-blue-600 hover:to-purple-600"
+                  >
+                    <span className="relative z-10">🚨 Xem phao cứu trợ</span>
+                  </button>
+                ) : (
+                  <>
+                    {(questionsExplanation?.length > 0 ||
+                      questionsExplanationImages?.length > 0) && (
+                      <div className="space-y-3 bg-blue-50 border border-blue-200 p-5 rounded-xl shadow-sm">
+                        <p className="text-center text-blue-700 uppercase font-semibold text-lg tracking-wider">
+                          🛟 Phao Cứu Sinh
+                        </p>
+
+                        {(() => {
+                          const items = [];
+                          const maxLength = Math.max(
+                            questionsExplanation?.length || 0,
+                            questionsExplanationImages?.length || 0
+                          );
+
+                          for (let i = 0; i < maxLength; i++) {
+                            if (questionsExplanation?.[i]) {
+                              items.push({
+                                type: "text",
+                                content: questionsExplanation[i],
+                              });
+                            }
+                            if (questionsExplanationImages?.[i]) {
+                              items.push({
+                                type: "image",
+                                content: questionsExplanationImages[i],
+                              });
+                            }
+                          }
+
+                          return items.map((item, index) =>
+                            item.type === "text" ? (
+                              <p
+                                key={index}
+                                className="text-gray-800 text-base leading-relaxed text-justify"
+                              >
+                                {item.content}
+                              </p>
+                            ) : (
+                              <ImageFromUrl
+                                key={index}
+                                objectId={item.content}
+                                className="max-w-full h-auto mx-auto rounded-md"
+                                style={undefined}
+                                setImgWidth={undefined}
+                                handleSetIsLoading={undefined}
+                                onClick={undefined}
+                              />
+                            )
+                          );
+                        })()}
+                      </div>
+                    )}
+                  </>
+                )}
+              </>
+            )}
           </div>
         )}
       </div>
@@ -486,7 +703,11 @@ const Matching = ({
         className={`w-full max-w-[60rem] absolute left-1/2 bottom-[-5rem] transform -translate-x-1/2 flex flex-row justify-between items-center h-auto`}
       >
         <button
-          onClick={() => handleQuestionChange(selectedQuestion - 1)}
+          onClick={() => {
+            audio.play();
+            handleQuestionChange(selectedQuestion - 1);
+            setShowExplation(false);
+          }}
           disabled={selectedQuestion === 0}
           className={`px-6 cursor-pointer py-3 text-lg font-bold rounded-full transition-all duration-300 
           ${
@@ -501,7 +722,11 @@ const Matching = ({
         {questions.length - 1 !== selectedQuestion ? (
           selectedIndices.length > 0 ? (
             <button
-              onClick={() => handleQuestionChange(selectedQuestion + 1)}
+              onClick={() => {
+                audio.play();
+                handleQuestionChange(selectedQuestion + 1);
+                setShowExplation(false);
+              }}
               className="px-6 cursor-pointer py-3 text-lg font-bold rounded-full transition-all duration-300 
              bg-gradient-to-b from-white to-green-300 text-green-900 shadow-md 
              hover:from-green-200 hover:to-green-500 hover:shadow-lg 
@@ -511,7 +736,11 @@ const Matching = ({
             </button>
           ) : (
             <button
-              onClick={() => handleQuestionChange(selectedQuestion + 1)}
+              onClick={() => {
+                audio.play();
+                handleQuestionChange(selectedQuestion + 1);
+                setShowExplation(false);
+              }}
               className="px-6 py-3 cursor-pointer text-lg font-bold rounded-full transition-all duration-300 
              bg-gradient-to-b from-white to-orange-300 text-orange-900 shadow-md 
              hover:from-orange-200 hover:to-orange-500 hover:shadow-lg 

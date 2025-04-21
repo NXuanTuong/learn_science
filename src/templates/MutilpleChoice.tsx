@@ -4,6 +4,8 @@ import { setUserAnswer } from "../store/listQuestionSlice";
 import { QuestionTemplateProps } from "../interface/question";
 import React from "react";
 import { selectAnsweredQuestions } from "../store/quizQuestionSlice";
+import { clickButton } from "../helper/sounds";
+import ImageFromUrl from "../helper/imageFromUrl";
 
 const MultipleChoiceQuestion = ({
   questionItem,
@@ -20,6 +22,8 @@ const MultipleChoiceQuestion = ({
     question.texts.length > 0
       ? question.texts.map((text, index) => text)
       : question.texts;
+  const questionsExplanation = questionItem.explanation.texts;
+  const questionsExplanationImages = questionItem.explanation.images;
 
   const dispatch = useDispatch();
   const getGridCols = () => {
@@ -28,7 +32,9 @@ const MultipleChoiceQuestion = ({
     if (questionChoices.length === 4) return "grid-cols-2"; // 2 trên, 2 dưới
     return "grid-cols-3"; // 3 trong một hàng
   };
+  const audio = new Audio(clickButton);
   const answeredQuestions = useSelector(selectAnsweredQuestions);
+  const [showExplation, setShowExplation] = useState(false);
 
   const [selectedIndex, setSelectedIndex] = useState(() => {
     const storedAnswers = localStorage.getItem("userAnswers");
@@ -46,6 +52,7 @@ const MultipleChoiceQuestion = ({
   });
 
   const handleSelect = (index) => {
+    audio.play();
     if (window.location.pathname === "/bai_kiem_tra_thuc_hanh") {
       if (selectedIndex === index) {
         saveAnswer(-1);
@@ -137,7 +144,9 @@ const MultipleChoiceQuestion = ({
   };
 
   const handleNextQuestion = () => {
+    audio.play();
     handleQuestionChange(selectedQuestion + 1);
+    setShowExplation(false);
   };
 
   const showSolutions = JSON.parse(
@@ -148,7 +157,9 @@ const MultipleChoiceQuestion = ({
     <>
       {questionText !== null &&
         questionText !== undefined &&
-        questionText.length > 0 && <div>{questionText}</div>}
+        questionText.length > 0 && (
+          <div className="select-none">{questionText}</div>
+        )}
 
       <div className="flex flex-col gap-8 justify-center items-center">
         <div className={`grid ${getGridCols()} gap-8 w-full`}>
@@ -180,7 +191,7 @@ const MultipleChoiceQuestion = ({
         </div>
 
         {showSolutions && (
-          <div className="flex flex-col gap-4 justify-center items-center">
+          <div className="flex flex-col gap-6 justify-center items-center">
             <p
               className={`text-xl uppercase font-bold px-6 py-3 rounded-lg transition-all duration-300 ease-in-out
             ${
@@ -191,40 +202,114 @@ const MultipleChoiceQuestion = ({
           `}
             >
               {question.solutions[selectedIndex] === true
-                ? "✅ Đúng rồi!"
+                ? "✅ Đúng rồi giỏi lắm!"
                 : "Sai rồi!"}
             </p>
 
-            <p className="text-yellow-500 text-2xl font-semibold tracking-widest">
-              ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨
-            </p>
+            {question.solutions[selectedIndex] === true ? (
+              <></>
+            ) : (
+              <>
+                <p className="text-yellow-500 text-2xl font-semibold tracking-widest">
+                  ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨
+                </p>
 
-            <div className="w-full max-w-[40rem] flex flex-col justify-center items-center bg-white p-4 rounded-lg shadow-md border border-gray-300">
-              <p className="text-lg font-bold text-gray-800 mb-2">
-                🎯 Đáp án đúng:
-              </p>
-              {questionChoices.map((choice, index) =>
-                question.solutions[index] ? ( // Chỉ hiển thị nếu đúng (true)
-                  <button
-                    key={index}
-                    disabled={JSON.parse(showSolutions)}
-                    className={`max-w-[20rem] h-auto cursor-pointer p-3 text-lg font-bold rounded-2xl relative transition-all duration-300 ease-in-out
+                <div className="w-full max-w-[40rem] flex flex-col justify-center items-center bg-white p-4 rounded-lg shadow-md border border-gray-300">
+                  <p className="text-lg font-bold text-gray-800 mb-2">
+                    🎯 Đáp án đúng:
+                  </p>
+                  {questionChoices.map((choice, index) =>
+                    question.solutions[index] ? ( // Chỉ hiển thị nếu đúng (true)
+                      <button
+                        key={index}
+                        disabled={JSON.parse(showSolutions)}
+                        className={`max-w-[20rem] h-auto cursor-pointer p-3 text-lg font-bold rounded-2xl relative transition-all duration-300 ease-in-out
                       bg-green-500 text-white shadow-[0px_4px_0px_#1B5E20] scale-105 border border-white
                       hover:from-green-400 hover:to-green-600 hover:shadow-[1px_1px_0px_#1B5E20]
                       active:shadow-none active:translate-y-[2px] active:translate-x-[2px]`}
+                      >
+                        {choice}
+                      </button>
+                    ) : null
+                  )}
+                </div>
+
+                {!showExplation ? (
+                  <button
+                    onClick={() => setShowExplation(true)}
+                    className="relative inline-flex items-center justify-center px-6 py-3 overflow-hidden font-bold text-white transition-all duration-300 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-xl shadow-lg hover:shadow-xl hover:scale-105 hover:from-blue-600 hover:to-purple-600"
                   >
-                    {choice}
+                    <span className="relative z-10">🚨 Xem phao cứu trợ</span>
                   </button>
-                ) : null
-              )}
-            </div>
+                ) : (
+                  <>
+                    {(questionsExplanation?.length > 0 ||
+                      questionsExplanationImages?.length > 0) && (
+                      <div className="space-y-3 bg-blue-50 border border-blue-200 p-5 rounded-xl shadow-sm">
+                        <p className="text-center text-blue-700 uppercase font-semibold text-lg tracking-wider">
+                          🛟 Phao Cứu Sinh
+                        </p>
+
+                        {(() => {
+                          const items = [];
+                          const maxLength = Math.max(
+                            questionsExplanation?.length || 0,
+                            questionsExplanationImages?.length || 0
+                          );
+
+                          for (let i = 0; i < maxLength; i++) {
+                            if (questionsExplanation?.[i]) {
+                              items.push({
+                                type: "text",
+                                content: questionsExplanation[i],
+                              });
+                            }
+                            if (questionsExplanationImages?.[i]) {
+                              items.push({
+                                type: "image",
+                                content: questionsExplanationImages[i],
+                              });
+                            }
+                          }
+
+                          return items.map((item, index) =>
+                            item.type === "text" ? (
+                              <p
+                                key={index}
+                                className="text-gray-800 text-base leading-relaxed text-justify"
+                              >
+                                {item.content}
+                              </p>
+                            ) : (
+                              <ImageFromUrl
+                                key={index}
+                                objectId={item.content}
+                                className="max-w-full h-auto mx-auto rounded-md"
+                                style={undefined}
+                                setImgWidth={undefined}
+                                handleSetIsLoading={undefined}
+                                onClick={undefined}
+                              />
+                            )
+                          );
+                        })()}
+                      </div>
+                    )}
+                  </>
+                )}
+              </>
+            )}
           </div>
         )}
       </div>
 
       <div className="w-full max-w-[60rem] bottom-[-5rem] absolute left-1/2 transform -translate-x-1/2 flex flex-row justify-between items-center h-auto">
         <button
-          onClick={() => handleQuestionChange(selectedQuestion - 1)}
+          onClick={() => {
+            audio.play();
+            handleQuestionChange(selectedQuestion - 1);
+            setShowExplation(false);
+          }}
           disabled={selectedQuestion === 0}
           className={`px-6 cursor-pointer py-3 text-lg font-bold rounded-full transition-all duration-300 
           ${
@@ -249,7 +334,11 @@ const MultipleChoiceQuestion = ({
             </button>
           ) : (
             <button
-              onClick={() => handleQuestionChange(selectedQuestion + 1)}
+              onClick={() => {
+                audio.play();
+                handleQuestionChange(selectedQuestion + 1);
+                setShowExplation(false);
+              }}
               className="px-6 py-3 cursor-pointer text-lg font-bold rounded-full transition-all duration-300 
              bg-gradient-to-b from-white to-orange-300 text-orange-900 shadow-md 
              hover:from-orange-200 hover:to-orange-500 hover:shadow-lg 

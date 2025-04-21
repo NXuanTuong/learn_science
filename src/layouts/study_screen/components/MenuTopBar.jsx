@@ -21,6 +21,11 @@ const MenuTopBar = () => {
       icon: <i className="fa-solid fa-book"></i>,
       path: "luyen_tap_thuc_hanh",
     },
+    {
+      title: "Thành tích",
+      icon: <i className="fa-solid fa-trophy"></i>,
+      path: "thanh_tich",
+    },
     // {
     //   title: "Về đích",
     //   icon: <i className="fa-solid fa-flag-checkered"></i>,
@@ -36,8 +41,8 @@ const MenuTopBar = () => {
   };
 
   const handleLogout = () => {
-    localStorage.clear();
     cookies.remove("signin_user");
+    localStorage.clear();
     navigate("/");
     toast.success("Đăng xuất thành công");
   };
@@ -45,6 +50,10 @@ const MenuTopBar = () => {
   useEffect(() => {
     if (window.location.pathname == "/trang_hoc_chinh/luyen_tap_thuc_hanh") {
       setCurrentPage(1);
+    }
+
+    if (window.location.pathname == "/trang_hoc_chinh/thanh_tich") {
+      setCurrentPage(2);
     }
 
     if (!cookies.get("signin_user")) {
@@ -67,12 +76,12 @@ const MenuTopBar = () => {
         </div>
 
         {/* Menu */}
-        <div className="flex flex-wrap justify-center flex-row items-center gap-6">
+        <div className="flex flex-wrap justify-center flex-row items-center gap-3">
           {listMenu.map((item, index) => (
             <Link key={index} to={item.path}>
               <span
                 onClick={() => handleChangePage(index)}
-                className={`p-3 px-5 h-12 cursor-pointer rounded-xl flex flex-row justify-center items-center gap-3 border transition-all duration-300 font-semibold
+                className={`p-3 px-5 h-12 cursor-pointer rounded-xl flex flex-row justify-center items-center gap-2 border transition-all duration-300 font-semibold
                 ${
                   currentPage === index
                     ? "bg-[#004a37] text-white shadow-lg scale-105"

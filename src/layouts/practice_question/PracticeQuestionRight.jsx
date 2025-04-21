@@ -3,6 +3,7 @@ import { connect, useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Cookies from "universal-cookie";
 import { submitAnswerPractice } from "../../config/quiz";
+import { sound1 } from "../../helper/sounds";
 import { clearQuestion } from "../../store/listQuestionSlice";
 import {
   getQuizInformations,
@@ -19,6 +20,10 @@ const PracticeQuestionRight = ({
   handleQuestionChange,
   setIsLoadingShowSolution,
   quizInformation,
+  stopAudio,
+  setIsRedo,
+  setIsLoading,
+  setSelectedQuestion,
 }) => {
   const dispatch = useDispatch();
   const cookie = new Cookies();
@@ -32,6 +37,7 @@ const PracticeQuestionRight = ({
   const [isPopupCaculationScore, setIsPopupCaculationScore] = useState(false);
   const navigate = useNavigate();
   var answeredQuestion = useSelector(selectAnsweredQuestions);
+  const audio = new Audio(sound1);
 
   const handleCloseQuestions = () => {
     if (!JSON.parse(localStorage.getItem("showSolutions"))) {
@@ -49,6 +55,8 @@ const PracticeQuestionRight = ({
   };
 
   const handleConfirmExit = () => {
+    stopAudio();
+
     if (window.location.pathname === "/bai_kiem_tra_thuc_hanh") {
       localStorage.removeItem("newPracticeId");
       localStorage.removeItem("questionStateExams");
@@ -121,6 +129,8 @@ const PracticeQuestionRight = ({
         console.log(error);
       }
     }
+    stopAudio();
+
     setIsPopupSubmitAllPractice(false);
     setIsPopupCaculationScore(true);
   };
@@ -340,6 +350,10 @@ const PracticeQuestionRight = ({
           isPopupCaculationScore={isPopupCaculationScore}
           setIsPopupCaculationScore={setIsPopupCaculationScore}
           questions={questions}
+          setIsRedo={setIsRedo}
+          setIsLoading={setIsLoading}
+          setSelectedQuestion={setSelectedQuestion}
+          stopAudio={stopAudio}
         />
       )}
 
@@ -370,9 +384,15 @@ const PracticeQuestionRight = ({
 
               const hasValidAnswer =
                 userAnswer &&
-                (userAnswer?.answer?.length > 0 ||
-                  (userAnswer?.answer !== null &&
-                    userAnswer?.userChoice?.length > 0));
+                ((userAnswer.answer?.length > 0 &&
+                  userAnswer.userChoice.some(
+                    (choice) => choice !== "" && choice !== -1
+                  )) ||
+                  (userAnswer.answer !== null &&
+                    Array.isArray(userAnswer.userChoice) &&
+                    userAnswer.userChoice.some(
+                      (choice) => choice !== "" && choice !== -1
+                    )));
 
               return (
                 <button

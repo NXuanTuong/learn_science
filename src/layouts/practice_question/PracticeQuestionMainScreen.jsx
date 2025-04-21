@@ -1,10 +1,10 @@
-import React, { use, useEffect, useState } from "react";
+import React, { use, useEffect, useRef, useState } from "react";
 import { connect, useDispatch } from "react-redux";
 import Cookies from "universal-cookie";
+import { sound1, sound2 } from "../../helper/sounds";
 import { getLessonQuestion } from "../../store/listQuestionSlice";
 import PracticeQuestionLeft from "./PracticeQuestionLeft";
 import PracticeQuestionRight from "./PracticeQuestionRight";
-import { useSearchParams } from "react-router-dom";
 
 const PracticeQuestionMainScreen = ({ questions }) => {
   const dispatch = useDispatch();
@@ -16,29 +16,41 @@ const PracticeQuestionMainScreen = ({ questions }) => {
     localStorage.getItem("showSolutions") === "true"
   );
   const [selectedQuestion, setSelectedQuestion] = useState(0);
-  const [searchParams] = useSearchParams();
+  const [isRedo, setIsRedo] = useState(false);
 
+  const audioRef = useRef(null); // tạo ref cho audio
 
   useEffect(() => {
-    if (questions === null || questions === undefined) {
+    if (!audioRef.current) {
+      audioRef.current = new Audio(
+        localStorage.getItem("lessonName") === "Thực vật và Động vật"
+          ? sound1
+          : sound2
+      );
+    }
+
+    if (questions === null || questions === undefined || isLoading) {
       setIsLoading(true);
     }
+    const searchParams = new URLSearchParams(window.location.search);
     let id = searchParams.get("id");
     let value = searchParams.get("value");
-    console.log("value", value);
-    let lessonId2="67cbccf76cd5f0e7bbc47987"
+    let lessonId2 = "67cbccf76cd5f0e7bbc47987";
+    const isRedo = searchParams.get("isRedo") === "true";
     dispatch(
       getLessonQuestion({
         lessonId: id ?? lessonId2,
         token,
-        value
+        type: value,
+        isRedo: Boolean(isRedo),
       })
     ).finally(() => {
       setTimeout(() => {
         setIsLoading(false);
+        audioRef.current?.play();
       }, 4000);
     });
-  }, [dispatch, token]);
+  }, [dispatch, isRedo, isLoading]);
 
   useEffect(() => {
     if (questions && questions.length > 0) {
@@ -67,12 +79,36 @@ const PracticeQuestionMainScreen = ({ questions }) => {
   useEffect(() => {
     if (localStorage.getItem("showSolutions")) {
       localStorage.removeItem("questionStateExams");
+      const searchParams = new URLSearchParams(window.location.search);
+      let id = searchParams.get("id");
+      let value = searchParams.get("value");
+      let lessonId2 = "67cbccf76cd5f0e7bbc47987";
+      const isRedo = searchParams.get("isRedo") === "true";
+      dispatch(
+        getLessonQuestion({
+          lessonId: id ?? lessonId2,
+          token,
+          type: value,
+          isRedo: Boolean(isRedo),
+        })
+      );
     }
 
     setTimeout(() => {
       setIsLoadingShowSolution(false);
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
     }, 3000);
   }, [isLoadingShowSolution]);
+
+  const stopAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+  };
 
   if (isLoading || isLoadingShowSolution) {
     return (
@@ -126,6 +162,10 @@ const PracticeQuestionMainScreen = ({ questions }) => {
         questions={questions}
         selectedIndex={selectedQuestion}
         handleQuestionChange={handleQuestionChange}
+        setSelectedQuestion={setSelectedQuestion}
+        stopAudio={stopAudio}
+        setIsRedo={setIsRedo}
+        setIsLoading={setIsLoading}
       />
     </div>
   );

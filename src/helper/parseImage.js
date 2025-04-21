@@ -1,5 +1,3 @@
-import { getUrlImage } from "../../config/utilities";
-import ConstantStrings from "../../constants/ConstantStrings";
 var imageCache = {};
 
 // const parseImage = async (key) => {
@@ -23,7 +21,9 @@ export const getCacheImage = (key) => {
 
 export const getImageUrl = (key) => {
   if (key !== null && key?.length > 0) {
-    var url = ConstantStrings.IMAGE_URL + encodeURIComponent(key);
+    var url =
+      "http://res.cloudinary.com/dkbxgqkgh/image/upload/v1740305447/" +
+      encodeURIComponent(key);
     url = url.replace(/\(/g, "%28").replace(/\)/g, "%29");
     if (imageCache[url]) {
       return imageCache[url];

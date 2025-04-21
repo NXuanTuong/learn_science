@@ -1,18 +1,54 @@
-import React from "react";
-import { Outlet } from "react-router-dom";
+import React, { useState } from "react";
+import { useEffect } from "react";
+import { connect, useDispatch } from "react-redux";
+import { Outlet, useNavigate } from "react-router-dom";
+import Cookies from "universal-cookie";
+import { getGradeUnit } from "../../config/unit";
+import { getLesson } from "../../store/lessonSlice";
 import MenuTopBar from "./components/MenuTopBar";
 
-const StudyMainScreen = () => {
+const StudyMainScreen = ({ listUnit }) => {
+  const cookie = new Cookies();
+  const token = cookie.get("signin_user");
+  const dispath = useDispatch();
+  const navigate = useNavigate();
+  const [video, setVideo] = useState();
+  useEffect(() => {
+    async function getUnit() {
+      dispath(
+        getLesson({
+          lessonId: "67b4a51e89de4c93cd4ac3e1",
+          token,
+        })
+      );
+    }
+
+    getUnit();
+  }, []);
+
   return (
     <>
-      <div className="min-h-screen  h-screen relative bg-cover bg-fixed bg-center bg-no-repeat bg-[url('/public/images/background_page_1.png')]">
+      <div className="min-h-screen relative bg-cover bg-fixed bg-center bg-no-repeat bg-[url('/public/images/background_page_1.png')]">
         {/* <div className="min-h-screen relative bg-[#b2c4a9]"> */}
-        <div className="w-full h-screen flex items-center flex-col gap-[2rem] ">
+        <div className="pt-10 pl-10">
+          <button
+            onClick={() => navigate("/chon_khoi")}
+            className="fixed z-100 cursor-pointer px-6 py-2 rounded-xl bg-gradient-to-r from-green-400 to-blue-500 text-white font-semibold text-base shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 hover:brightness-110"
+          >
+            {localStorage.getItem("grade")
+              ? localStorage.getItem("grade")
+              : "Chọn khối"}
+          </button>
+        </div>
+
+        <div className="w-full flex items-center flex-col gap-[2rem]">
           <div className="w-full flex justify-center items-center flex-col pt-8">
             <MenuTopBar />
           </div>
 
-          <Outlet />
+          <div className="pb-8 w-full flex justify-center items-center">
+            <Outlet />
+          </div>
         </div>
 
         <img
@@ -31,4 +67,10 @@ const StudyMainScreen = () => {
   );
 };
 
-export default StudyMainScreen;
+function mapStateToProps(state) {
+  return {
+    listUnit: state.lesson.listUnit,
+  };
+}
+
+export default connect(mapStateToProps)(StudyMainScreen);
