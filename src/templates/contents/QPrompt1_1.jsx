@@ -36,7 +36,7 @@ function QPrompt1_1({ data, order, isLast }) {
             <ImageFromUrl
               key={index}
               objectId={item.value}
-              className="max-h-64 object-contain mx-auto"
+              className="object-contain mx-auto"
             />
           )
         )}

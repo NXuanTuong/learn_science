@@ -18,17 +18,7 @@ const PracticeQuestionMainScreen = ({ questions }) => {
   const [selectedQuestion, setSelectedQuestion] = useState(0);
   const [isRedo, setIsRedo] = useState(false);
 
-  const audioRef = useRef(null); // tạo ref cho audio
-
   useEffect(() => {
-    if (!audioRef.current) {
-      audioRef.current = new Audio(
-        localStorage.getItem("lessonName") === "Thực vật và Động vật"
-          ? sound1
-          : sound2
-      );
-    }
-
     if (questions === null || questions === undefined || isLoading) {
       setIsLoading(true);
     }
@@ -47,10 +37,9 @@ const PracticeQuestionMainScreen = ({ questions }) => {
     ).finally(() => {
       setTimeout(() => {
         setIsLoading(false);
-        audioRef.current?.play();
       }, 4000);
     });
-  }, [dispatch, isRedo, isLoading]);
+  }, [isRedo, isLoading]);
 
   useEffect(() => {
     if (questions && questions.length > 0) {
@@ -96,19 +85,8 @@ const PracticeQuestionMainScreen = ({ questions }) => {
 
     setTimeout(() => {
       setIsLoadingShowSolution(false);
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
-      }
     }, 3000);
   }, [isLoadingShowSolution]);
-
-  const stopAudio = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-    }
-  };
 
   if (isLoading || isLoadingShowSolution) {
     return (
@@ -141,9 +119,13 @@ const PracticeQuestionMainScreen = ({ questions }) => {
   return (
     <div
       className={`relative flex min-h-screen bg-cover bg-center bg-no-repeat ${
-        localStorage.getItem("showSolutions")
-          ? "bg-[url('/public/images/background_solutions.png')]"
-          : "bg-[url('/public/images/background_questions.png')]"
+        localStorage.getItem("lessonName") === "Thực vật và Động vật"
+          ? localStorage.getItem("showSolutions")
+            ? "bg-[url('/public/images/background_solutions.png')]"
+            : "bg-[url('/public/images/background_questions.png')]"
+          : localStorage.getItem("showSolutions")
+          ? "bg-[url('/public/images/backgroundLT2.jpg')]"
+          : "bg-[url('/public/images/backgroundLT1.jpg')]"
       } w-full flex flex-row`}
     >
       {questions && (
@@ -163,7 +145,6 @@ const PracticeQuestionMainScreen = ({ questions }) => {
         selectedIndex={selectedQuestion}
         handleQuestionChange={handleQuestionChange}
         setSelectedQuestion={setSelectedQuestion}
-        stopAudio={stopAudio}
         setIsRedo={setIsRedo}
         setIsLoading={setIsLoading}
       />

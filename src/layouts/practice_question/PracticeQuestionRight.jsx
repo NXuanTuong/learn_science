@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { connect, useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Cookies from "universal-cookie";
 import { submitAnswerPractice } from "../../config/quiz";
-import { sound1 } from "../../helper/sounds";
+import { sound1, sound2 } from "../../helper/sounds";
 import { clearQuestion } from "../../store/listQuestionSlice";
 import {
   getQuizInformations,
@@ -20,7 +20,6 @@ const PracticeQuestionRight = ({
   handleQuestionChange,
   setIsLoadingShowSolution,
   quizInformation,
-  stopAudio,
   setIsRedo,
   setIsLoading,
   setSelectedQuestion,
@@ -37,7 +36,17 @@ const PracticeQuestionRight = ({
   const [isPopupCaculationScore, setIsPopupCaculationScore] = useState(false);
   const navigate = useNavigate();
   var answeredQuestion = useSelector(selectAnsweredQuestions);
-  const audio = new Audio(sound1);
+  const audioRef = useRef(null);
+  const [isReset, setIsReset] = useState(false);
+
+  const updateIsRedo = () => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const isRedo = searchParams.get("isRedo") === "true";
+    searchParams.set("isRedo", (!isRedo).toString());
+
+    const newUrl = `${window.location.pathname}?${searchParams.toString()}`;
+    window.history.replaceState(null, "", newUrl);
+  };
 
   const handleCloseQuestions = () => {
     if (!JSON.parse(localStorage.getItem("showSolutions"))) {
@@ -48,25 +57,57 @@ const PracticeQuestionRight = ({
         setIsPopupOpen(true);
       }
     } else {
-      localStorage.removeItem("newPracticeId");
-      localStorage.removeItem("questionStateExams");
-      navigate("/trang_hoc_chinh/luyen_tap_thuc_hanh");
+      if (window.location.pathname === "/bai_kiem_tra_thuc_hanh") {
+        localStorage.removeItem("newPracticeId");
+        localStorage.removeItem("questionStateExams");
+        navigate("/trang_hoc_chinh/luyen_tap_thuc_hanh");
+      } else {
+        setIsReset(true);
+      }
+    }
+  };
+
+  const handleNotReset = () => {
+    localStorage.removeItem("newPracticeId");
+    localStorage.removeItem("questionStateExams");
+    // localStorage.removeItem("lessonName");
+    navigate("/trang_hoc_chinh/luyen_tap_thuc_hanh");
+    setIsReset(false);
+    setIsShowPopupCancel(false);
+    setIsPopupOpen(false);
+
+    dispatch(clearQuestion());
+
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
     }
   };
 
   const handleConfirmExit = () => {
-    stopAudio();
-
     if (window.location.pathname === "/bai_kiem_tra_thuc_hanh") {
       localStorage.removeItem("newPracticeId");
       localStorage.removeItem("questionStateExams");
       localStorage.removeItem("showListUnit");
+
+      setIsShowPopupCancel(false);
+      setIsPopupOpen(false);
+      navigate("/trang_hoc_chinh/luyen_tap_thuc_hanh");
+
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
     } else {
-      dispatch(clearQuestion());
+      if (JSON.parse(localStorage.getItem("showSolutions"))) {
+        setIsReset(true);
+      } else {
+        setIsShowPopupCancel(false);
+        setIsPopupOpen(false);
+        navigate("/trang_hoc_chinh/luyen_tap_thuc_hanh");
+        dispatch(clearQuestion());
+      }
     }
-    setIsShowPopupCancel(false);
-    setIsPopupOpen(false);
-    navigate("/trang_hoc_chinh/luyen_tap_thuc_hanh");
   };
 
   const handleCancelExit = () => {
@@ -130,7 +171,6 @@ const PracticeQuestionRight = ({
         console.log(error);
       }
     }
-    stopAudio();
 
     setIsPopupSubmitAllPractice(false);
     setIsPopupCaculationScore(true);
@@ -162,11 +202,62 @@ const PracticeQuestionRight = ({
           token,
         })
       );
+    } else {
+      if (!audioRef.current) {
+        audioRef.current = new Audio(
+          localStorage.getItem("lessonName") === "Thực vật và Động vật"
+            ? sound1
+            : sound2
+        );
+      }
+
+      audioRef.current?.play();
     }
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0; // Nếu muốn dừng hoàn toàn và reset lại
+      }
+    };
   }, []);
 
   return (
     <>
+      {isReset && (
+        <>
+          <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm z-[1100] transition-opacity duration-300">
+            <div className="bg-white p-6 rounded-2xl shadow-2xl text-center w-120 animate-fadeIn">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">
+                Bạn có muốn làm lại không ?
+              </h2>
+
+              <div className="flex justify-center gap-4">
+                <button
+                  onClick={() => {
+                    updateIsRedo();
+                    setIsRedo(true);
+                    setIsLoading(true);
+                    setSelectedQuestion(0);
+                    localStorage.removeItem("userAnswers");
+                    localStorage.removeItem("showSolutions");
+                  }}
+                  className="mt-3 cursor-pointer px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 hover:scale-105 transition-all duration-300 ease-in-out"
+                >
+                  🔁 Làm lại nhé!
+                </button>
+
+                <button
+                  onClick={handleNotReset}
+                  className="mt-3 cursor-pointer px-6 py-3 rounded-xl bg-gradient-to-r from-red-500 to-red-400 text-white font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 hover:scale-105 transition-all duration-300 ease-in-out"
+                >
+                  Thoát
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
       {isShowPopupCancel && (
         <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm z-[1100] transition-opacity duration-300">
           <div className="bg-white p-6 rounded-2xl shadow-2xl text-center w-120 animate-fadeIn">
@@ -354,7 +445,6 @@ const PracticeQuestionRight = ({
           setIsRedo={setIsRedo}
           setIsLoading={setIsLoading}
           setSelectedQuestion={setSelectedQuestion}
-          stopAudio={stopAudio}
         />
       )}
 

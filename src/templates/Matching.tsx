@@ -16,7 +16,7 @@ const Matching = ({
   const questionChoices = question.choices;
   const questionTargets = question.targets;
   const questionsExplanation = questionItem.explanation.texts;
-   const questionsExplanationImages = questionItem.explanation.images;
+  const questionsExplanationImages = questionItem.explanation.images;
 
   console.log(questionTargets);
 
@@ -643,7 +643,7 @@ const Matching = ({
                       questionsExplanationImages?.length > 0) && (
                       <div className="space-y-3 bg-blue-50 border border-blue-200 p-5 rounded-xl shadow-sm">
                         <p className="text-center text-blue-700 uppercase font-semibold text-lg tracking-wider">
-                          🛟 Phao Cứu Sinh
+                          🛟 Phao Cứu Trợ
                         </p>
 
                         {(() => {

@@ -247,7 +247,7 @@ const MultipleChoiceQuestion = ({
                       questionsExplanationImages?.length > 0) && (
                       <div className="space-y-3 bg-blue-50 border border-blue-200 p-5 rounded-xl shadow-sm">
                         <p className="text-center text-blue-700 uppercase font-semibold text-lg tracking-wider">
-                          🛟 Phao Cứu Sinh
+                          🛟 Phao Cứu Trợ
                         </p>
 
                         {(() => {

@@ -15,7 +15,6 @@ const ScorePopup = ({
   setIsRedo,
   setIsLoading,
   setSelectedQuestion,
-  stopAudio,
 }) => {
   const [isLoadingScore, setIsLoadingScore] = useState(true);
   const [correctCount, setCorrectCount] = useState(0);
@@ -48,7 +47,6 @@ const ScorePopup = ({
     if (isPopupCaculationScore) {
       setIsLoadingScore(true);
 
-      stopAudio();
       setTimeout(() => {
         calculateScore();
         setIsLoadingScore(false);
@@ -269,21 +267,6 @@ const ScorePopup = ({
                 📖 Xem lời giải
               </button>
             </div>
-            <button
-              onClick={() => {
-                updateIsRedo();
-                setShowRewardPopup(false);
-                setIsRedo(true);
-                setIsLoading(true);
-                setSelectedQuestion(0);
-                localStorage.removeItem("userAnswers");
-                stopAudio1();
-                stopAudio2();
-              }}
-              className="mt-3 cursor-pointer px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 hover:scale-105 transition-all duration-300 ease-in-out"
-            >
-              🔁 Làm lại nhé!
-            </button>
           </div>
         </div>
       )}

@@ -23,12 +23,10 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
   const [lessonId, setLessonId] = useState("");
   const [showPopup, setShowPopup] = useState(false);
 
-  const handleGetListQuestions = async (id) => {
+  const handleGetListQuestions = async (id, title) => {
     try {
-      // localStorage.setItem(
-      //   "practiceName",
-      //   "Bài Tập về Khoa Học, Thực Vật, Động Vật..."
-      // );
+      localStorage.setItem("practiceName", title);
+      localStorage.setItem("lessonId", id);
       // localStorage.removeItem("userAnswers");
       setLessonId(id);
       setSelectDifficulty(true);
@@ -37,19 +35,18 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
     }
   };
 
+  console.log(lessonId);
+
   const handleSelectDifficulty = async (value) => {
     audio.play();
     setShowPopup(false);
     localStorage.setItem("type", value);
+    localStorage.setItem("selectDifficulty", true);
     try {
-      localStorage.setItem(
-        "practiceName",
-        "Bài Tập về Khoa Học, Thực Vật, Động Vật..."
-      );
       localStorage.removeItem("userAnswers");
       navigate(
         "/cau_hoi_luyen_tap?id=" +
-          lessonId +
+          (lessonId ? lessonId : localStorage.getItem("lessonId")) +
           "&value=" +
           value +
           "&isRedo=" +
@@ -84,10 +81,10 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
     );
   };
 
-  useEffect(() => {
-    const navEntries = performance.getEntriesByType("navigation");
-    const isReload = navEntries.length > 0 && navEntries[0].type === "reload";
+  const navEntries = performance.getEntriesByType("navigation");
+  const isReload = navEntries.length > 0 && navEntries[0].type === "reload";
 
+  useEffect(() => {
     if (location.pathname !== "/cau_hoi_luyen_tap") {
       localStorage.removeItem("practiceName");
       localStorage.removeItem("userAnswers");
@@ -101,6 +98,10 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
       setShowListUnit(false);
     }
 
+    if (localStorage.getItem("selectDifficulty")) {
+      setSelectDifficulty(true);
+    }
+
     dispatch(clearState());
 
     dispatch(
@@ -112,8 +113,11 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
 
     if (isReload) {
       localStorage.removeItem("showListUnit");
+      setShowListUnit(false);
     }
-  }, []);
+  }, [isReload]);
+
+  console.log(listAnUnit);
 
   return (
     <>
@@ -133,7 +137,9 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
                           className="object-cover w-full h-full"
                           src={
                             item.image === ""
-                              ? "/images/background_questions.png"
+                              ? item?.name === "Năng lượng"
+                                ? "/images/backgroundUnitNăngLượng.jpg"
+                                : "/images/background_questions.png"
                               : item.image
                           }
                           alt="plant-quiz"
@@ -148,6 +154,15 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
                         onClick={() => {
                           showListAnUnit(item._id);
                           localStorage.setItem("lessonName", item.name);
+
+                          const queryParams = new URLSearchParams({
+                            lessonName: item.name,
+                          });
+
+                          // Điều hướng kèm query
+                          navigate(
+                            `/trang_hoc_chinh/luyen_tap_thuc_hanh?${queryParams.toString()}`
+                          );
                         }}
                         className="cursor-pointer z-10 w-[10rem] h-[3rem] rounded-full bg-[#007f5f] text-white uppercase text-lg font-bold leading-none shadow-lg shadow-[#004a37] transition-all duration-300 ease-in-out transform hover:scale-100 hover:bg-[#005a40] hover:shadow-xl hover:shadow-[#005a40] hover:-translate-y-1"
                       >
@@ -159,11 +174,13 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
               })}
           </>
         )}
+
         {selectDifficulty && (
           <>
             <span
               onClick={() => {
                 setSelectDifficulty(false);
+                localStorage.removeItem("selectDifficulty");
                 setLessonId("");
               }}
               className="absolute z-50 top-[20px] left-[150px] cursor-pointer flex items-center gap-2 px-6 py-3 bg-green-600 text-white font-semibold rounded-full shadow-lg transition-all duration-300 hover:bg-green-700 hover:scale-105 animate-bounce"
@@ -182,91 +199,39 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
               </svg>
               Quay lại chọn bài giảng
             </span>
-            <div className="relative flex flex-col gap-8 px-6 py-7 items-center justify-center w-[20rem] h-[15rem] rounded-[2rem] bg-white/10 backdrop-blur-2xl border border-white/30 shadow-[0_20px_60px_rgba(0,0,0,0.15)] hover:shadow-[0_30px_80px_rgba(0,0,0,0.2)] transition-all duration-500 hover:-translate-y-2 hover:scale-[1.03]">
+            <div className="relative flex flex-col gap-8 px-6 py-7 items-center justify-center w-[20rem] rounded-[2rem] bg-white/10 backdrop-blur-2xl border border-white/30 shadow-[0_20px_60px_rgba(0,0,0,0.15)] hover:shadow-[0_30px_80px_rgba(0,0,0,0.2)] transition-all duration-500 hover:-translate-y-2 hover:scale-[1.03]">
               {/* Light blobs for dreamy effect */}
 
               {/* Title */}
               <h2 className="text-2xl font-extrabold text-green-800 drop-shadow-md text-center">
-                Khám Phá Thử Thách!
+                🧠 Chọn độ khó
               </h2>
 
               {/* Buttons */}
               <div className="flex flex-col gap-5 w-full items-center">
                 <button
-                  onClick={() => {
-                    audio.play();
-                    setShowPopup(true);
-                  }}
-                  className="cursor-pointer w-[15rem] h-[3.5rem] rounded-full bg-gradient-to-r from-[#00c896] to-[#007f5f] text-white font-semibold text-lg uppercase shadow-md hover:from-[#00a37c] hover:to-[#005a40] hover:shadow-lg transition-all duration-300"
+                  onClick={() => handleSelectDifficulty(1)}
+                  className="cursor-pointer w-full px-4 py-3 rounded-xl bg-green-100 hover:bg-green-200 text-[#005f3c] font-semibold flex items-center gap-2 justify-center transition"
                 >
-                  Chọn Độ Khó
+                  🚀 Khởi động
                 </button>
 
-                {/* <button className="cursor-pointer w-[15rem] h-[3.5rem] rounded-full bg-gradient-to-r from-[#00c896] to-[#007f5f] text-white font-semibold text-lg uppercase shadow-md hover:from-[#00a37c] hover:to-[#005a40] hover:shadow-lg transition-all duration-300">
-                  Phao Cứu Trợ
-                </button> */}
+                <button
+                  onClick={() => handleSelectDifficulty(2)}
+                  className="cursor-pointer w-full px-4 py-3 rounded-xl bg-yellow-100 hover:bg-yellow-200 text-yellow-800 font-semibold flex items-center gap-2 justify-center transition"
+                >
+                  ⚡ Tăng tốc
+                </button>
+
+                <button
+                  onClick={() => handleSelectDifficulty(3)}
+                  className="cursor-pointer w-full px-4 py-3 rounded-xl bg-red-100 hover:bg-red-200 text-red-600 font-semibold flex items-center gap-2 justify-center transition"
+                >
+                  🏁 Về đích
+                </button>
               </div>
             </div>
-
-            {/* <div className="flex flex-col gap-[2rem] p-[3rem] items-center justify-center relative w-[20rem] h-[27rem] cursor-pointer rounded-3xl border border-[#007f5f] bg-[#eaf7e3] shadow-xl transition-all duration-300 hover:shadow-2xl hover:ring-2 hover:ring-[#007f5f] hover:-translate-y-2">
-            {difficulties.map((difficulty, index) => {
-              return (
-                <button
-                  key={index}
-                  onClick={() => handleSelectDifficulty(difficulty.value)}
-                  className="cursor-pointer z-10 w-[10rem] h-[3rem] rounded-full bg-[#007f5f] text-white uppercase text-lg font-bold leading-none shadow-lg shadow-[#004a37] transition-all duration-300 ease-in-out transform hover:scale-100 hover:bg-[#005a40] hover:shadow-xl hover:shadow-[#005a40] hover:-translate-y-1"
-                >
-                  <p>{difficulty.name}</p>
-                </button>
-              );
-            })}
-          </div> */}
           </>
-        )}
-
-        {showPopup && (
-          <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-            <div className="relative bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] p-8 w-[22rem] flex flex-col gap-5 border-2 border-[#007f5f] animate-fade-in-down z-50">
-              {/* Nút đóng ở góc phải */}
-              <button
-                onClick={() => {
-                  setShowPopup(false);
-                  audio.play();
-                }}
-                className="absolute top-3 right-3 w-9 h-9 rounded-full bg-gradient-to-br from-[#c2fbd7] to-[#8fd3f4] text-[#005f3c] text-lg font-bold shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer"
-                aria-label="Đóng"
-              >
-                ✖
-              </button>
-
-              {/* Tiêu đề popup */}
-              <p className="text-xl font-bold text-[#007f5f] uppercase text-center mb-2 flex items-center justify-center gap-2">
-                🧠 Chọn độ khó
-              </p>
-
-              {/* Nút chọn độ khó */}
-              <button
-                onClick={() => handleSelectDifficulty(1)}
-                className="cursor-pointer w-full px-4 py-3 rounded-xl bg-green-100 hover:bg-green-200 text-[#005f3c] font-semibold flex items-center gap-2 justify-center transition"
-              >
-                🚀 Khởi động
-              </button>
-
-              <button
-                onClick={() => handleSelectDifficulty(2)}
-                className="cursor-pointer w-full px-4 py-3 rounded-xl bg-yellow-100 hover:bg-yellow-200 text-yellow-800 font-semibold flex items-center gap-2 justify-center transition"
-              >
-                ⚡ Tăng tốc
-              </button>
-
-              <button
-                onClick={() => handleSelectDifficulty(3)}
-                className="cursor-pointer w-full px-4 py-3 rounded-xl bg-red-100 hover:bg-red-200 text-red-600 font-semibold flex items-center gap-2 justify-center transition"
-              >
-                🏁 Về đích
-              </button>
-            </div>
-          </div>
         )}
 
         {showListUnit && !selectDifficulty && (
@@ -274,6 +239,8 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
             <span
               onClick={() => {
                 localStorage.removeItem("showListUnit");
+                localStorage.removeItem("lessonName");
+                navigate("/trang_hoc_chinh/luyen_tap_thuc_hanh");
                 setShowListUnit(false);
               }}
               className="absolute z-50 top-[20px] left-[50px] cursor-pointer flex items-center gap-2 px-3 py-3 bg-green-600 text-white font-semibold rounded-full shadow-lg transition-all duration-300 hover:bg-green-700 hover:scale-105 animate-bounce"
@@ -305,7 +272,9 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
                         className="object-cover w-full h-full"
                         src={
                           item.image === ""
-                            ? "/images/background_questions.png"
+                            ? item?.title === "Âm thanh"
+                              ? "/images/background2.jpg"
+                              : "/images/background_questions.png"
                             : item.image
                         }
                         alt="plant-quiz"
@@ -317,7 +286,9 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
                     </p>
 
                     <button
-                      onClick={() => handleGetListQuestions(item.id)}
+                      onClick={() =>
+                        handleGetListQuestions(item.id, item.title)
+                      }
                       className="cursor-pointer z-10 w-[10rem] h-[3rem] rounded-full bg-[#007f5f] text-white uppercase text-lg font-bold leading-none shadow-lg shadow-[#004a37] transition-all duration-300 ease-in-out transform hover:scale-100 hover:bg-[#005a40] hover:shadow-xl hover:shadow-[#005a40] hover:-translate-y-1"
                     >
                       Làm Ngay
@@ -338,7 +309,11 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
                 <div className="w-full h-[12rem] overflow-hidden rounded-xl border border-[#007f5f]">
                   <img
                     className="object-cover w-full h-full"
-                    src="/images/background_questions.png"
+                    src={
+                      localStorage.getItem("lessonName") === "Năng lượng"
+                        ? "/images/background3.jpg"
+                        : "/images/background_questions.png"
+                    }
                     alt="plant-quiz"
                   />
                 </div>

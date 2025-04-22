@@ -26,9 +26,18 @@ const StudyMainScreen = ({ listUnit }) => {
     getUnit();
   }, []);
 
+  // /public/images/background1.jpg
   return (
     <>
-      <div className="min-h-screen relative bg-cover bg-fixed bg-center bg-no-repeat bg-[url('/public/images/background_page_1.png')]">
+      <div
+        className={`min-h-screen relative bg-cover bg-fixed bg-center bg-no-repeat ${
+          localStorage.getItem("lessonName") !== null
+            ? localStorage.getItem("lessonName") === "Năng lượng"
+              ? "bg-[url('/public/images/backgroundUnitNăngLượng.jpg')]"
+              : "bg-[url('/public/images/background_page_1.png')]"
+            : "bg-[url('/public/images/background1.jpg')]"
+        }`}
+      >
         {/* <div className="min-h-screen relative bg-[#b2c4a9]"> */}
         <div className="pt-10 pl-10">
           <button

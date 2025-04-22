@@ -1,5 +1,6 @@
 import React, { Fragment, useState } from "react";
 import { useDispatch } from "react-redux";
+import ImageFromUrl from "../helper/imageFromUrl";
 import { clickButton } from "../helper/sounds";
 import { QuestionTemplateProps } from "../interface/question";
 import { setUserAnswer } from "../store/listQuestionSlice";
@@ -19,6 +20,7 @@ const GapfillInline = ({
   const [showExplation, setShowExplation] = useState(false);
   const audio = new Audio(clickButton);
   const questionsExplanation = questionItem.explanation.texts;
+  const questionsExplanationImages = questionItem.explanation.images;
 
   const [answers, setAnswers] = useState<string[]>(() => {
     const storedAnswers = localStorage.getItem("userAnswers");
@@ -36,7 +38,8 @@ const GapfillInline = ({
 
   const handleAnswerChange = (value: string, index: number) => {
     const updated = [...answers];
-    updated[index] = value.toLowerCase();
+    updated[index] = value;
+    const normalizedAnswers = updated.map((item) => item.toLowerCase());
 
     dispatch(
       setUserAnswer({
@@ -44,18 +47,18 @@ const GapfillInline = ({
           window.location.pathname === "/bai_kiem_tra_thuc_hanh"
             ? questionItem.questionId
             : questionItem._id,
-        answer: updated,
+        answer: normalizedAnswers,
         questionIndex: selectedQuestion,
         template: "GapfillInline",
-        userChoice: updated,
+        userChoice: normalizedAnswers,
       })
     );
 
     if (window.location.pathname === "/bai_kiem_tra_thuc_hanh") {
-      saveAnswer(updated, questionItem.questionId);
+      saveAnswer(normalizedAnswers, questionItem.questionId);
     }
 
-    setAnswers(updated);
+    setAnswers(normalizedAnswers);
   };
 
   const saveAnswer = (answer: Object, questionId: String) => {
@@ -208,20 +211,64 @@ const GapfillInline = ({
                   >
                     <span className="relative z-10">🚨 Xem phao cứu trợ</span>
                   </button>
+                ) : questionsExplanation.length === 0 ||
+                  questionsExplanation === null ? (
+                  <></>
                 ) : (
-                  <div className="space-y-3 bg-blue-50 border border-blue-200 p-5 rounded-xl shadow-sm">
-                    <p className="text-center text-blue-700 uppercase font-semibold text-lg tracking-wider">
-                      🛟 Phao Cứu Sinh
-                    </p>
-                    {questionsExplanation.map((line, index) => (
-                      <p
-                        key={index}
-                        className="text-gray-800 text-base leading-relaxed"
-                      >
-                        {line}
-                      </p>
-                    ))}
-                  </div>
+                  <>
+                    {(questionsExplanation?.length > 0 ||
+                      questionsExplanationImages?.length > 0) && (
+                      <div className="space-y-3 bg-blue-50 border border-blue-200 p-5 rounded-xl shadow-sm">
+                        <p className="text-center text-blue-700 uppercase font-semibold text-lg tracking-wider">
+                          🛟 Phao Cứu Trợ
+                        </p>
+
+                        {(() => {
+                          const items = [];
+                          const maxLength = Math.max(
+                            questionsExplanation?.length || 0,
+                            questionsExplanationImages?.length || 0
+                          );
+
+                          for (let i = 0; i < maxLength; i++) {
+                            if (questionsExplanation?.[i]) {
+                              items.push({
+                                type: "text",
+                                content: questionsExplanation[i],
+                              });
+                            }
+                            if (questionsExplanationImages?.[i]) {
+                              items.push({
+                                type: "image",
+                                content: questionsExplanationImages[i],
+                              });
+                            }
+                          }
+
+                          return items.map((item, index) =>
+                            item.type === "text" ? (
+                              <p
+                                key={index}
+                                className="text-gray-800 text-base leading-relaxed text-justify"
+                              >
+                                {item.content}
+                              </p>
+                            ) : (
+                              <ImageFromUrl
+                                key={index}
+                                objectId={item.content}
+                                className="max-w-full h-auto mx-auto rounded-md"
+                                style={undefined}
+                                setImgWidth={undefined}
+                                handleSetIsLoading={undefined}
+                                onClick={undefined}
+                              />
+                            )
+                          );
+                        })()}
+                      </div>
+                    )}
+                  </>
                 )}
               </>
             )}

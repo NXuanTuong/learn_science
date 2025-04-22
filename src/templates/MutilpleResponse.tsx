@@ -5,6 +5,7 @@ import { QuestionTemplateProps } from "../interface/question";
 import React from "react";
 import { selectAnsweredQuestions } from "../store/quizQuestionSlice";
 import { clickButton } from "../helper/sounds";
+import ImageFromUrl from "../helper/imageFromUrl";
 
 const MultipleResponseQuestion = ({
   question,
@@ -16,6 +17,7 @@ const MultipleResponseQuestion = ({
 }: QuestionTemplateProps) => {
   const questionChoices = question.choices;
   const questionsExplanation = questionItem.explanation.texts;
+  const questionsExplanationImages = questionItem.explanation.images;
   const dispatch = useDispatch();
 
   const audio = new Audio(clickButton);
@@ -233,19 +235,60 @@ const MultipleResponseQuestion = ({
                     <span className="relative z-10">🚨 Xem phao cứu trợ</span>
                   </button>
                 ) : (
-                  <div className="space-y-3 bg-blue-50 border border-blue-200 p-5 rounded-xl shadow-sm">
-                    <p className="text-center text-blue-700 uppercase font-semibold text-lg tracking-wider">
-                      🛟 Phao Cứu Sinh
-                    </p>
-                    {questionsExplanation.map((line, index) => (
-                      <p
-                        key={index}
-                        className="text-gray-800 text-base leading-relaxed"
-                      >
-                        {line}
-                      </p>
-                    ))}
-                  </div>
+                  <>
+                    {(questionsExplanation?.length > 0 ||
+                      questionsExplanationImages?.length > 0) && (
+                      <div className="space-y-3 bg-blue-50 border border-blue-200 p-5 rounded-xl shadow-sm">
+                        <p className="text-center text-blue-700 uppercase font-semibold text-lg tracking-wider">
+                          🛟 Phao Cứu Trợ
+                        </p>
+
+                        {(() => {
+                          const items = [];
+                          const maxLength = Math.max(
+                            questionsExplanation?.length || 0,
+                            questionsExplanationImages?.length || 0
+                          );
+
+                          for (let i = 0; i < maxLength; i++) {
+                            if (questionsExplanation?.[i]) {
+                              items.push({
+                                type: "text",
+                                content: questionsExplanation[i],
+                              });
+                            }
+                            if (questionsExplanationImages?.[i]) {
+                              items.push({
+                                type: "image",
+                                content: questionsExplanationImages[i],
+                              });
+                            }
+                          }
+
+                          return items.map((item, index) =>
+                            item.type === "text" ? (
+                              <p
+                                key={index}
+                                className="text-gray-800 text-base leading-relaxed text-justify"
+                              >
+                                {item.content}
+                              </p>
+                            ) : (
+                              <ImageFromUrl
+                                key={index}
+                                objectId={item.content}
+                                className="max-w-full h-auto mx-auto rounded-md"
+                                style={undefined}
+                                setImgWidth={undefined}
+                                handleSetIsLoading={undefined}
+                                onClick={undefined}
+                              />
+                            )
+                          );
+                        })()}
+                      </div>
+                    )}
+                  </>
                 )}
               </>
             )}

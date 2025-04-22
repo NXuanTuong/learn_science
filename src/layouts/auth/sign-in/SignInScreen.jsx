@@ -63,7 +63,7 @@ const SignInScreen = () => {
         setProgress((prev) => {
           if (prev >= 100) {
             clearInterval(interval);
-            navigate("/trang_hoc_chinh");
+            navigate("/chon_khoi");
             return 100;
           }
           return prev + 5; // tốc độ tiến trình
