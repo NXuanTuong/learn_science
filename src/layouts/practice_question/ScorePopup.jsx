@@ -215,27 +215,31 @@ const ScorePopup = ({
                 câu
               </p>
 
-              <div className="flex justify-center gap-6 mt-6">
-                <button
-                  onClick={() => {
-                    localStorage.setItem("showSolutions", "true");
-                    setIsLoadingShowSolution(true);
-                    setIsPopupCaculationScore(false);
-                    handleQuestionChange(0);
-                    localStorage.setItem("scorePractice", correctCount);
-                    localStorage.setItem("maxScore", questions.length);
-                    stopAudio1();
-                    stopAudio2();
-                  }}
-                  className="cursor-pointer px-6 py-3 bg-gradient-to-r
+              {window.location.pathname !== "/bai_kiem_tra_thuc_hanh" ? (
+                <></>
+              ) : (
+                <div className="flex justify-center gap-6 mt-6">
+                  <button
+                    onClick={() => {
+                      localStorage.setItem("showSolutions", "true");
+                      setIsLoadingShowSolution(true);
+                      setIsPopupCaculationScore(false);
+                      handleQuestionChange(0);
+                      localStorage.setItem("scorePractice", correctCount);
+                      localStorage.setItem("maxScore", questions.length);
+                      stopAudio1();
+                      stopAudio2();
+                    }}
+                    className="cursor-pointer px-6 py-3 bg-gradient-to-r
                   from-green-500 to-green-700 text-white font-medium rounded-lg
                   shadow-lg hover:opacity-90 transition-all transform
                   hover:scale-105 active:scale-95" // onClick=
-                >
-                  {" "}
-                  📖 Xem lời giải
-                </button>
-              </div>
+                  >
+                    {" "}
+                    📖 Xem lời giải
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>

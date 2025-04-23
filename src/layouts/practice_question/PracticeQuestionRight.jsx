@@ -60,6 +60,7 @@ const PracticeQuestionRight = ({
       if (window.location.pathname === "/bai_kiem_tra_thuc_hanh") {
         localStorage.removeItem("newPracticeId");
         localStorage.removeItem("questionStateExams");
+        localStorage.removeItem("lessonName");
         navigate("/trang_hoc_chinh/luyen_tap_thuc_hanh");
       } else {
         setIsReset(true);
@@ -102,6 +103,9 @@ const PracticeQuestionRight = ({
       if (JSON.parse(localStorage.getItem("showSolutions"))) {
         setIsReset(true);
       } else {
+        if (window.location.pathname !== "/bai_kiem_tra_thuc_hanh") {
+          localStorage.removeItem("lessonName");
+        }
         setIsShowPopupCancel(false);
         setIsPopupOpen(false);
         navigate("/trang_hoc_chinh/luyen_tap_thuc_hanh");
@@ -258,6 +262,7 @@ const PracticeQuestionRight = ({
           </div>
         </>
       )}
+
       {isShowPopupCancel && (
         <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm z-[1100] transition-opacity duration-300">
           <div className="bg-white p-6 rounded-2xl shadow-2xl text-center w-120 animate-fadeIn">

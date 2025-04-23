@@ -27,8 +27,7 @@ const MultipleChoiceQuestion = ({
 
   const dispatch = useDispatch();
   const getGridCols = () => {
-    if (questionChoices.length >= 6) return "grid-cols-4"; // 3 trên, 2 dưới
-    if (questionChoices.length === 5) return "grid-cols-3"; // 3 trên, 2 dưới
+    if (questionChoices.length >= 5) return "grid-cols-3"; // 3 trên, 2 dưới
     if (questionChoices.length === 4) return "grid-cols-2"; // 2 trên, 2 dưới
     return "grid-cols-3"; // 3 trong một hàng
   };
@@ -171,7 +170,7 @@ const MultipleChoiceQuestion = ({
                 key={index}
                 onClick={() => handleSelect(index)}
                 disabled={showSolutions}
-                className={`max-w-[20rem] h-auto cursor-pointer p-3 text-lg font-bold rounded-2xl relative transition-all duration-300 ease-in-out
+                className={`max-w-[40rem] h-auto cursor-pointer p-3 text-lg font-bold rounded-2xl relative transition-all duration-300 ease-in-out
               ${
                 isSelected
                   ? showSolutions
@@ -223,7 +222,7 @@ const MultipleChoiceQuestion = ({
                       <button
                         key={index}
                         disabled={JSON.parse(showSolutions)}
-                        className={`max-w-[20rem] h-auto cursor-pointer p-3 text-lg font-bold rounded-2xl relative transition-all duration-300 ease-in-out
+                        className={`max-w-[40rem] h-auto cursor-pointer p-3 text-lg font-bold rounded-2xl relative transition-all duration-300 ease-in-out
                       bg-green-500 text-white shadow-[0px_4px_0px_#1B5E20] scale-105 border border-white
                       hover:from-green-400 hover:to-green-600 hover:shadow-[1px_1px_0px_#1B5E20]
                       active:shadow-none active:translate-y-[2px] active:translate-x-[2px]`}
