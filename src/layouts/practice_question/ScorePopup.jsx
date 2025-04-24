@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { connect, useDispatch } from "react-redux";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Cookies from "universal-cookie";
 import { addAchievement } from "../../config/achievement";
 import { sound3, sound4 } from "../../helper/sounds";
@@ -23,6 +23,7 @@ const ScorePopup = ({
   const cookie = new Cookies();
   const token = cookie.get("signin_user");
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate()
 
   const updateIsRedo = () => {
     const searchParams = new URLSearchParams(window.location.search);
@@ -162,6 +163,11 @@ const ScorePopup = ({
     }
   };
 
+  const handleExit = ()=>{
+    localStorage.removeItem("userAnswers");
+    navigate("/trang_hoc_chinh/luyen_tap_thuc_hanh")
+  }
+
   return (
     <>
       {isPopupCaculationScore && (
@@ -216,7 +222,14 @@ const ScorePopup = ({
               </p>
 
               {window.location.pathname !== "/bai_kiem_tra_thuc_hanh" ? (
-                <></>
+                <>
+                 <button
+                  onClick={handleExit}
+                  className="mt-3 cursor-pointer px-6 py-3 rounded-xl bg-gradient-to-r from-red-500 to-red-400 text-white font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 hover:scale-105 transition-all duration-300 ease-in-out"
+                >
+                  Thoát
+                </button>
+                </>
               ) : (
                 <div className="flex justify-center gap-6 mt-6">
                   <button

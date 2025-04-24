@@ -71,6 +71,7 @@ const PracticeQuestionRight = ({
   const handleNotReset = () => {
     localStorage.removeItem("newPracticeId");
     localStorage.removeItem("questionStateExams");
+    localStorage.removeItem("userAnswers");
     // localStorage.removeItem("lessonName");
     navigate("/trang_hoc_chinh/luyen_tap_thuc_hanh");
     setIsReset(false);
@@ -208,7 +209,7 @@ const PracticeQuestionRight = ({
     ) {
       dispatch(
         getQuizInformations({
-          quizId: "67cbd500a8a69a4dd320b14b",
+          quizId: localStorage.getItem("quizId"),
           token,
         })
       );
