@@ -1,6 +1,6 @@
 import { connect, useDispatch } from "react-redux";
 import "./practice.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "universal-cookie";
 import {
@@ -22,6 +22,7 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
   const [selectDifficulty, setSelectDifficulty] = useState(false);
   const [lessonId, setLessonId] = useState("");
   const [showPopup, setShowPopup] = useState(false);
+  const videoRef = useRef(null);
 
   const handleGetListQuestions = async (id, title) => {
     try {
@@ -35,11 +36,8 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
     }
   };
 
-  console.log(lessonId);
-
   const handleSelectDifficulty = async (value) => {
     audio.play();
-    setShowPopup(false);
     localStorage.setItem("type", value);
     localStorage.setItem("selectDifficulty", true);
     try {
@@ -57,7 +55,7 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
     }
   };
 
-  const handleCreatePracticeQuiz = (quizInformationId) => {
+  const handleCreatePracticeQuiz = (quizInformationId, name) => {
     dispatch(
       createNewPractice({
         quizInforId: quizInformationId,
@@ -65,9 +63,9 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
       })
     );
 
-    localStorage.setItem("practiceName", "🌿 Thế Giới Thực Vật");
+    localStorage.setItem("practiceName", `Về đích - ${name}`);
 
-    navigate("/bai_kiem_tra_thuc_hanh");
+    navigate("/bai_kiem_tra_thuc_hanh?page=VeDich");
   };
 
   const showListAnUnit = (gradeId) => {
@@ -106,7 +104,9 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
 
     dispatch(
       getQuizInformations({
-        quizId: "67cbd500a8a69a4dd320b14b",
+        quizId: listAnUnit?.quizId
+          ? listAnUnit?.quizId
+          : localStorage.getItem("quizId"),
         token,
       })
     );
@@ -117,10 +117,56 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
     }
   }, [isReload]);
 
-  console.log(listAnUnit);
+  useEffect(() => {
+    const isViewed = localStorage.getItem("video_popup_viewed");
+    if (!isViewed) {
+      setShowPopup(true);
+    }
+  }, []);
+
+  const handleClose = () => {
+    setShowPopup(false);
+    localStorage.setItem("video_popup_viewed", "true");
+    // Optional: stop video
+    if (videoRef.current) {
+      videoRef.current.pause();
+    }
+  };
 
   return (
     <>
+      <>
+        <>
+          {showPopup && (
+            <div className="fixed inset-0 backdrop-blur-sm z-[1100] transition-opacity duration-300 flex justify-center items-center">
+              <div className="bg-white p-4 rounded-lg w-5/4 max-w-4xl relative">
+                {/* Nút đóng popup */}
+                <button
+                  onClick={handleClose}
+                  className="absolute cursor-pointer top-2 right-2 z-[1200] text-red-600 text-xl font-bold"
+                >
+                  ✖
+                </button>
+
+                {/* Video */}
+                <video
+                  ref={videoRef}
+                  controls
+                  autoPlay
+                  width="100%"
+                  className="rounded-xl shadow-lg"
+                >
+                  <source
+                    src="/videos/VIDEO HUONG DAN LAM BAI.mp4"
+                    type="video/mp4"
+                  />
+                  Trình duyệt của bạn không hỗ trợ video.
+                </video>
+              </div>
+            </div>
+          )}
+        </>
+      </>
       <div className="flex flex-row justify-center items-center gap-6 w-full relative">
         {!showListUnit && !selectDifficulty && (
           <>
@@ -154,6 +200,7 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
                         onClick={() => {
                           showListAnUnit(item._id);
                           localStorage.setItem("lessonName", item.name);
+                          localStorage.setItem("quizId", listAnUnit.quizId);
 
                           const queryParams = new URLSearchParams({
                             lessonName: item.name,
@@ -239,9 +286,9 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
             <span
               onClick={() => {
                 localStorage.removeItem("showListUnit");
+                setShowListUnit(false);
                 localStorage.removeItem("lessonName");
                 navigate("/trang_hoc_chinh/luyen_tap_thuc_hanh");
-                setShowListUnit(false);
               }}
               className="absolute z-50 top-[20px] left-[50px] cursor-pointer flex items-center gap-2 px-3 py-3 bg-green-600 text-white font-semibold rounded-full shadow-lg transition-all duration-300 hover:bg-green-700 hover:scale-105 animate-bounce"
             >
@@ -335,7 +382,7 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
                 <button
                   onClick={() =>
                     localStorage.getItem("scorePractice") &&
-                    handleCreatePracticeQuiz(listAnUnit.quizId)
+                    handleCreatePracticeQuiz(listAnUnit.quizId, listAnUnit.name)
                   }
                   className={`cursor-pointer z-10 w-[10rem] h-[3rem] rounded-full text-white uppercase text-lg font-bold leading-none shadow-lg transition-all duration-300 ease-in-out transform ${
                     !localStorage.getItem("scorePractice")

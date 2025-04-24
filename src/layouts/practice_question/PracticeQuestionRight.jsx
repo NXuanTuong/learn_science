@@ -90,6 +90,7 @@ const PracticeQuestionRight = ({
       localStorage.removeItem("newPracticeId");
       localStorage.removeItem("questionStateExams");
       localStorage.removeItem("showListUnit");
+      localStorage.removeItem("lessonName");
 
       setIsShowPopupCancel(false);
       setIsPopupOpen(false);
@@ -103,15 +104,20 @@ const PracticeQuestionRight = ({
       if (JSON.parse(localStorage.getItem("showSolutions"))) {
         setIsReset(true);
       } else {
-        if (window.location.pathname !== "/bai_kiem_tra_thuc_hanh") {
-          localStorage.removeItem("lessonName");
-        }
         setIsShowPopupCancel(false);
         setIsPopupOpen(false);
         navigate("/trang_hoc_chinh/luyen_tap_thuc_hanh");
         dispatch(clearQuestion());
       }
     }
+  };
+
+  const exitFinished = () => {
+    localStorage.removeItem("lessonName");
+    setIsShowPopupCancel(false);
+    setIsPopupOpen(false);
+    navigate("/trang_hoc_chinh/luyen_tap_thuc_hanh");
+    dispatch(clearQuestion());
   };
 
   const handleCancelExit = () => {
@@ -167,7 +173,7 @@ const PracticeQuestionRight = ({
         // Đợi submitAnswerPractice hoàn thành rồi mới gọi getQuizQuestions
         dispatch(
           getQuizInformations({
-            quizId: "67cbd500a8a69a4dd320b14b",
+            quizId: localStorage.getItem("quizId"),
             token,
           })
         );
@@ -215,7 +221,7 @@ const PracticeQuestionRight = ({
         );
       }
 
-      audioRef.current?.play();
+      // audioRef.current?.play();
     }
 
     return () => {
@@ -277,7 +283,7 @@ const PracticeQuestionRight = ({
                 Nộp toàn bộ
               </button>
               <button
-                onClick={handleConfirmExit}
+                onClick={exitFinished}
                 className="cursor-pointer px-5 py-2.5 bg-gray-300 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-400 active:bg-gray-500 transition-all"
               >
                 Thoát và không làm câu còn lại

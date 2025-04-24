@@ -298,11 +298,6 @@ const Matching = ({
                 (item) => item[0] === index + 1
               );
               const isSelected = pairIndex !== -1;
-              const selectedValue = isSelected
-                ? selectedIndices[pairIndex][1]
-                : null;
-              const correctAnswer = question.solutions[index];
-              const isCorrect = selectedValue === correctAnswer;
 
               const backgroundColor = isSelected
                 ? getColorForIndex(pairIndex)
@@ -316,24 +311,16 @@ const Matching = ({
                 // Hiển thị ảnh nếu là đường dẫn
                 <div
                   key={index}
-                  onClick={() => handleSelectLeft(index)}
-                  className={`relative px-4 py-3 bg-white border-2 rounded-lg cursor-pointer transition-all duration-200 ease-in-out
-                  ${
-                    showSolutions
-                      ? isCorrect
-                        ? "outline outline-2 outline-green-700"
-                        : "outline outline-2 outline-red-700"
-                      : "outline outline-green-500"
+                  onClick={() =>
+                    JSON.parse(showSolutions) ? null : handleSelectLeft(index)
                   }
+                  className={`relative px-4 py-3 bg-white border-2 rounded-lg cursor-pointer transition-all duration-200 ease-in-out
+                outline outline-green-500
                   hover:brightness-105 active:scale-95`}
                   style={{
                     backgroundColor,
                     color: isSelected ? "white" : "#2E7D32",
-                    outlineColor: showSolutions
-                      ? isCorrect
-                        ? "#1B5E20"
-                        : "#B71C1C"
-                      : "#4CAF50",
+                    outlineColor: "#4CAF50",
                   }}
                 >
                   <ImageFromUrl
@@ -344,11 +331,6 @@ const Matching = ({
                     handleSetIsLoading={undefined}
                     onClick={undefined}
                   />
-                  {showSolutions && (
-                    <span className="absolute right-2 top-2 text-lg">
-                      {isCorrect ? "✅" : "❌"}
-                    </span>
-                  )}
                 </div>
               ) : (
                 // Hiển thị button nếu không phải là ảnh
@@ -359,29 +341,13 @@ const Matching = ({
                   style={{
                     backgroundColor,
                     color: isSelected ? "white" : "#2E7D32",
-                    outlineColor: showSolutions
-                      ? isCorrect
-                        ? "#1B5E20"
-                        : "#B71C1C"
-                      : "#4CAF50",
+                    outlineColor: "#4CAF50",
                   }}
                   className={`min-w-[150px] px-6 py-3 text-lg font-bold rounded-lg transition-all duration-200 ease-in-out
-        flex items-center justify-center text-center whitespace-normal break-words relative
-        ${
-          showSolutions
-            ? isCorrect
-              ? "outline-2 outline-green-700"
-              : "outline-2 outline-red-700"
-            : "outline outline-green-500"
-        }
+       outline outline-green-500
         hover:brightness-110 hover:shadow-md active:scale-95 active:shadow-none`}
                 >
                   {choice}
-                  {showSolutions && (
-                    <span className="absolute right-2 top-2 text-lg">
-                      {isCorrect ? "✅" : "❌"}
-                    </span>
-                  )}
                 </button>
               );
             })}
@@ -393,11 +359,6 @@ const Matching = ({
                 (item) => item[1] === index + 1
               );
               const isSelected = pairIndex !== -1;
-              const selectedValue = isSelected
-                ? selectedIndices[pairIndex][0]
-                : null;
-              const correctAnswer = question.solutions[index];
-              const isCorrect = selectedValue === correctAnswer;
 
               const backgroundColor = isSelected
                 ? getColorForIndex(pairIndex) // Giữ màu nếu đã chọn
@@ -417,22 +378,13 @@ const Matching = ({
                     }
                   }}
                   className={`relative px-4 py-3 bg-white border-2 rounded-lg cursor-pointer transition-all duration-200 ease-in-out
-                  ${
-                    showSolutions
-                      ? isCorrect
-                        ? "outline outline-2 outline-green-700"
-                        : "outline outline-2 outline-red-700"
-                      : "outline outline-green-500"
-                  }
+                  
+                       "outline outline-green-500"
                   hover:brightness-105 active:scale-95`}
                   style={{
                     backgroundColor,
                     color: isSelected ? "white" : "#2E7D32",
-                    outlineColor: showSolutions
-                      ? isCorrect
-                        ? "#1B5E20"
-                        : "#B71C1C"
-                      : "#4CAF50",
+                    outlineColor: "#4CAF50",
                   }}
                 >
                   <ImageFromUrl
@@ -443,11 +395,6 @@ const Matching = ({
                     handleSetIsLoading={undefined}
                     onClick={undefined}
                   />
-                  {showSolutions && (
-                    <span className="absolute right-2 top-2 text-lg">
-                      {isCorrect ? "✅" : "❌"}
-                    </span>
-                  )}
                 </div>
               ) : (
                 <button
@@ -457,31 +404,15 @@ const Matching = ({
                   style={{
                     backgroundColor,
                     color: isSelected ? "white" : "#2E7D32",
-                    outlineColor: showSolutions
-                      ? isCorrect
-                        ? "#1B5E20" // Viền xanh nếu đúng
-                        : "#B71C1C" // Viền đỏ nếu sai
-                      : "#4CAF50",
+                    outlineColor: "#4CAF50",
                   }}
                   className={`min-w-[150px] cursor-pointer px-6 py-3 text-lg font-bold rounded-lg transition-all duration-200 ease-in-out
           flex items-center justify-center text-center whitespace-normal break-words relative
-          ${
-            showSolutions
-              ? isCorrect
-                ? "outline-2 outline-green-700"
-                : "outline-2 outline-red-700"
-              : "outline outline-green-500"
+               "outline outline-green-500"
           }
           hover:brightness-110 hover:shadow-md active:scale-95 active:shadow-none`}
                 >
                   {choice}
-
-                  {/* Nếu showSolutions bật, luôn hiển thị icon đúng/sai */}
-                  {showSolutions && (
-                    <span className="absolute right-2 top-2 text-lg">
-                      {isCorrect ? "✅" : "❌"}
-                    </span>
-                  )}
                 </button>
               );
             })}

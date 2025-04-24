@@ -94,7 +94,7 @@ const ScorePopup = ({
 
     const percentage = (correct / questions.length) * 100;
 
-    if (percentage >= 80) {
+    if (percentage === 100) {
       setGold(true);
       if (window.location.pathname !== "/bai_kiem_tra_thuc_hanh") {
         let value = searchParams.get("value");
