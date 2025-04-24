@@ -66,6 +66,7 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
         token,
       })
     );
+    localStorage.setItem("quizId", quizInformationId);
 
     localStorage.setItem("practiceName", `Về đích - ${name}`);
 
