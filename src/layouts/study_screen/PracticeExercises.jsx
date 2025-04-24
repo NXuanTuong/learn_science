@@ -10,6 +10,7 @@ import {
 } from "../../store/quizQuestionSlice";
 import { clickButton } from "../../helper/sounds";
 import { getAnUnits } from "../../store/lessonSlice";
+import { clearQuestion } from "../../store/listQuestionSlice";
 
 const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
   const navigate = useNavigate();
@@ -42,6 +43,7 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
     localStorage.setItem("selectDifficulty", true);
     try {
       localStorage.removeItem("userAnswers");
+      dispatch(clearQuestion());
       navigate(
         "/cau_hoi_luyen_tap?id=" +
           (lessonId ? lessonId : localStorage.getItem("lessonId")) +
@@ -56,6 +58,8 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
   };
 
   const handleCreatePracticeQuiz = (quizInformationId, name) => {
+    dispatch(clearQuestion());
+    localStorage.removeItem("userAnswers");
     dispatch(
       createNewPractice({
         quizInforId: quizInformationId,

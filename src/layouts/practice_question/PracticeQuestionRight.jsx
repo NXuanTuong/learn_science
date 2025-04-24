@@ -71,6 +71,7 @@ const PracticeQuestionRight = ({
   const handleNotReset = () => {
     localStorage.removeItem("newPracticeId");
     localStorage.removeItem("questionStateExams");
+    localStorage.removeItem("userAnswers");
     // localStorage.removeItem("lessonName");
     navigate("/trang_hoc_chinh/luyen_tap_thuc_hanh");
     setIsReset(false);
