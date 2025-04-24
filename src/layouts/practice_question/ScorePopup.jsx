@@ -223,12 +223,12 @@ const ScorePopup = ({
 
               {window.location.pathname !== "/bai_kiem_tra_thuc_hanh" ? (
                 <>
-                 <button
+                 {/* <button
                   onClick={handleExit}
                   className="mt-3 cursor-pointer px-6 py-3 rounded-xl bg-gradient-to-r from-red-500 to-red-400 text-white font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 hover:scale-105 transition-all duration-300 ease-in-out"
                 >
                   Thoát
-                </button>
+                </button> */}
                 </>
               ) : (
                 <div className="flex justify-center gap-6 mt-6">

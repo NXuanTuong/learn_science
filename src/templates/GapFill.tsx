@@ -47,10 +47,10 @@ const Gapfill = ({
           window.location.pathname === "/bai_kiem_tra_thuc_hanh"
             ? questionItem.questionId
             : questionItem._id,
-        answer: normalizedAnswers,
+        answer: updated,
         questionIndex: selectedQuestion,
         template: "GapFill",
-        userChoice: normalizedAnswers,
+        userChoice: updated,
       })
     );
 
@@ -58,7 +58,7 @@ const Gapfill = ({
       saveAnswer(normalizedAnswers, questionItem.questionId);
     }
 
-    setAnswers(normalizedAnswers);
+    setAnswers(updated);
   };
 
   const saveAnswer = (answer: Object, questionId: String) => {
