@@ -102,14 +102,16 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
 
     dispatch(clearState());
 
-    dispatch(
-      getQuizInformations({
-        quizId: listAnUnit?.quizId
-          ? listAnUnit?.quizId
-          : localStorage.getItem("quizId"),
-        token,
-      })
-    );
+    if (listAnUnit?.quizId || localStorage.getItem("quizId")) {
+      dispatch(
+        getQuizInformations({
+          quizId: listAnUnit?.quizId
+            ? listAnUnit?.quizId
+            : localStorage.getItem("quizId"),
+          token,
+        })
+      );
+    }
 
     if (isReload) {
       localStorage.removeItem("showListUnit");
