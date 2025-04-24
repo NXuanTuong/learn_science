@@ -137,38 +137,6 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
 
   return (
     <>
-      <>
-        <>
-          {showPopup && (
-            <div className="fixed inset-0 backdrop-blur-sm z-[1100] transition-opacity duration-300 flex justify-center items-center">
-              <div className="bg-white p-4 rounded-lg w-5/4 max-w-4xl relative">
-                {/* Nút đóng popup */}
-                <button
-                  onClick={handleClose}
-                  className="absolute cursor-pointer top-2 right-2 z-[1200] text-red-600 text-xl font-bold"
-                >
-                  ✖
-                </button>
-
-                {/* Video */}
-                <video
-                  ref={videoRef}
-                  controls
-                  autoPlay
-                  width="100%"
-                  className="rounded-xl shadow-lg"
-                >
-                  <source
-                    src="/videos/VIDEO HUONG DAN LAM BAI.mp4"
-                    type="video/mp4"
-                  />
-                  Trình duyệt của bạn không hỗ trợ video.
-                </video>
-              </div>
-            </div>
-          )}
-        </>
-      </>
       <div className="flex flex-row justify-center items-center gap-6 w-full relative">
         {!showListUnit && !selectDifficulty && (
           <>
@@ -226,6 +194,37 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
 
         {selectDifficulty && (
           <>
+            <>
+              {showPopup && (
+                <div className="fixed inset-0 backdrop-blur-sm z-[1100] transition-opacity duration-300 flex justify-center items-center">
+                  <div className="bg-white p-4 rounded-lg w-5/4 max-w-4xl relative">
+                    {/* Nút đóng popup */}
+                    <button
+                      onClick={handleClose}
+                      className="absolute cursor-pointer top-2 right-2 z-[1200] text-red-600 text-xl font-bold"
+                    >
+                      ✖
+                    </button>
+
+                    {/* Video */}
+                    <video
+                      ref={videoRef}
+                      controls
+                      autoPlay
+                      width="100%"
+                      className="rounded-xl shadow-lg"
+                    >
+                      <source
+                        src="/videos/Nội dung đoạn văn bản của bạn.mp4"
+                        type="video/mp4"
+                      />
+                      Trình duyệt của bạn không hỗ trợ video.
+                    </video>
+                  </div>
+                </div>
+              )}
+            </>
+
             <span
               onClick={() => {
                 setSelectDifficulty(false);
