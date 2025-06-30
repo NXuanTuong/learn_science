@@ -335,12 +335,19 @@ const PracticeExercises = ({ quizInformation, quiz, listUnit, listAnUnit }) => {
                     </div>
 
                     <p className="font-bold text-2xl text-[#007f5f] text-center tracking-wide">
-                      {item.title}
+                      {item?.title !== "Âm thanh"
+                        ? "Thực vật và động vật cần gì để sống; ứng dụng thực tiễn nhu cầu sống của thực vật và động vật"
+                        : item?.title}
                     </p>
 
                     <button
                       onClick={() =>
-                        handleGetListQuestions(item.id, item.title)
+                        handleGetListQuestions(
+                          item.id,
+                          item?.title !== "Âm thanh"
+                            ? "Thực vật và động vật cần gì để sống; ứng dụng thực tiễn nhu cầu sống của thực vật và động vật"
+                            : item?.title
+                        )
                       }
                       className="cursor-pointer z-10 w-[10rem] h-[3rem] rounded-full bg-[#007f5f] text-white uppercase text-lg font-bold leading-none shadow-lg shadow-[#004a37] transition-all duration-300 ease-in-out transform hover:scale-100 hover:bg-[#005a40] hover:shadow-xl hover:shadow-[#005a40] hover:-translate-y-1"
                     >
